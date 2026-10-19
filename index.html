@@ -62,6 +62,25 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
 .step .k { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
 .arrow { align-self: center; color: var(--ink-soft); font-size: 20px; }
 @media (max-width: 560px) { .arrow { display: none; } section { padding: 16px; } }
+.map { display: grid; grid-template-columns: minmax(70px, 150px) 1fr 1fr; gap: 10px; margin: 8px 0 6px; }
+.colh, .rowh { font-weight: 600; font-size: 14px; color: var(--ink-soft); text-align: center; align-self: end; }
+.rowh { align-self: center; }
+.q { position: relative; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; min-height: 150px;
+  padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--q-cool-line); background: var(--q-cool); color: var(--ink);
+  font: inherit; cursor: pointer; }
+.q.warm { background: var(--q-warm); border-color: var(--q-warm-line); }
+.q:hover { border-style: dashed; }
+.q:focus-visible { outline: 3px solid var(--ai); outline-offset: 2px; }
+.q .qt { font-weight: 600; color: var(--q-ink); font-size: 16px; }
+.q .qs { font-size: 13.5px; color: var(--ink-soft); }
+.q svg { width: 120px; height: 40px; margin-top: auto; }
+.q .pin { display: none; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.q.on { border: 3px solid var(--accent); }
+.q.on .pin { display: inline-block; }
+#maptable tr.on td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.status { font-size: 14px; }
+.todo { color: var(--warn); }
+@media (max-width: 560px) { .map { grid-template-columns: 1fr 1fr; } .map > div:first-child, .rowh { display: none; } .colh { font-size: 12.5px; } .q { min-height: 130px; padding: 10px; } .q .qt { font-size: 14.5px; } }
 </style>
 </head>
 <body>
@@ -134,14 +153,72 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
 
   <section id="map">
     <h2>Where it sits on our map</h2>
-    <div class="pending">In progress.</div>
+    <p class="meta">Tap a quadrant to try it: the map and the table mark it. Nothing is saved. My answer, <b>AI alone, with checks</b>, is marked when the page loads.</p>
+    <div class="map" id="mapgrid">
+      <div></div>
+      <div class="colh">Work with a right answer</div>
+      <div class="colh">Work with no single right answer</div>
+      <div class="rowh">Work that people and AI must do together</div>
+      <button class="q warm" data-q="tl" type="button"><span class="qt">A person leads, AI inside</span><span class="qs">The person leads and AI works inside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="40" cy="20" r="14" fill="var(--person)"/><circle cx="66" cy="20" r="8" fill="var(--ai)"/></svg><span class="pin">SG Weather Watch</span></button>
+      <button class="q cool" data-q="tr" type="button"><span class="qt">Agents run it, a person judges</span><span class="qs">Agents run the process and a person judges inside it.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="30" cy="20" r="8" fill="var(--ai)"/><circle cx="52" cy="20" r="8" fill="var(--ai)"/><circle cx="80" cy="20" r="12" fill="var(--person)"/></svg><span class="pin">SG Weather Watch</span></button>
+      <div class="rowh">Work that either of them can do alone</div>
+      <button class="q cool" data-q="bl" type="button"><span class="qt">AI alone, with checks</span><span class="qs">AI does it, with spot checks.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--ai)"/><circle cx="84" cy="20" r="6" fill="none" stroke="var(--person)" stroke-width="3"/></svg><span class="pin">SG Weather Watch</span></button>
+      <button class="q warm" data-q="br" type="button"><span class="qt">A person decides, AI alongside</span><span class="qs">A person decides with AI alongside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--person)"/><circle cx="80" cy="20" r="9" fill="var(--ai)"/></svg><span class="pin">SG Weather Watch</span></button>
+    </div>
+    <p class="status" id="mapstatus" aria-live="polite"></p>
+    <div class="scroll">
+    <table id="maptable">
+      <thead><tr><th>Quadrant</th><th>A right answer?</th><th>Together or alone?</th><th>The person in the loop</th></tr></thead>
+      <tbody>
+        <tr data-q="tl"><td><b>A person leads, AI inside</b><br><span class="meta">top left</span></td><td>A right answer</td><td>Must do it together</td><td>The person leads and AI works inside; the person signs off what AI has checked.</td></tr>
+        <tr data-q="tr"><td><b>Agents run it, a person judges</b><br><span class="meta">top right</span></td><td>No single right answer</td><td>Must do it together</td><td>Agents run the process, and a person judges inside it at the judgement points.</td></tr>
+        <tr data-q="bl"><td><b>AI alone, with checks</b><br><span class="meta">bottom left</span></td><td>A right answer</td><td>Either can do it alone</td><td>AI does it, with spot checks; a person reads its report or audits its log.</td></tr>
+        <tr data-q="br"><td><b>A person decides, AI alongside</b><br><span class="meta">bottom right</span></td><td>No single right answer</td><td>Either can do it alone</td><td>A person decides with AI alongside, which drafts the options and checks the facts.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="meta">Purple stands for the person and blue for AI, as in our Week 7 deck.</p>
   </section>
 
-  <section id="q1"><h2>Q1</h2><div class="pending">In progress.</div></section>
-  <section id="log"><h2>Collaboration log</h2><div class="pending">In progress.</div></section>
-  <section id="reflection"><h2>Reflection</h2><div class="pending">In progress.</div></section>
+  <section id="q1">
+    <h2>Q1 · Where does my agent sit, and what does that mean for the person in the loop?</h2>
+    <h3>(a) My quadrant</h3>
+    <p><b>AI alone, with checks</b> (bottom left).</p>
+    <h3>(b) The two questions</h3>
+    <p><b>Work with a right answer.</b> Every email can be checked against a source of truth: the forecast either matches BBC Weather's Singapore page at that time or it doesn't. The tricky case showed this too: with the wrong location ID there was a clear wrong answer (a 404), not a matter of taste. <span class="todo" data-todo="runs">[Run evidence to add: each email checked against Zap history and the BBC page.]</span></p>
+    <p><b>Work that either of them can do alone.</b> I could look up the forecast myself in a minute, and the Zap does it with no human step at all: one trigger, one action, no approval in between. Nothing in the job needs a person and AI working on the same item at once.</p>
+    <h3>(c) The person in the loop</h3>
+    <p><b>Where I stay at the gate:</b> not before each email, but after. In my evening check I confirm the Zap is still on, compare each email with Zap history, and spot-check one forecast against bbc.co.uk/weather. <b>What the agent may do alone:</b> read one public feed and email one fixed address, mine. The Gmail "To" field is typed in, never mapped, so it cannot reach anyone else. <b>What would move it:</b> if it emailed classmates or clients, I would want to approve before sending, which moves it to <i>A person leads, AI inside</i>. If it advised on choices with no single right answer (for example "should we hold the outdoor event tomorrow?"), it moves to <i>A person decides, AI alongside</i>, with me making the call.</p>
+    <h3>(d) My group's view</h3>
+    <p class="todo" data-todo="group">[To add: where our group placed its agents in class, and whether I agree.]</p>
+  </section>
+
+  <section id="log">
+    <h2>Collaboration log</h2>
+    <p class="todo" data-todo="log">[Being completed after the runs.]</p>
+  </section>
+
+  <section id="reflection">
+    <h2>Reflection</h2>
+    <p class="todo" data-todo="reflection">[Being completed after the runs.]</p>
+  </section>
 
   <p class="meta">Our group's interactive map board from Week 7 is at <a href="board.html">board.html</a>. This page holds no client data or keys, email addresses are cropped from the screenshots, and the Zap-history JSON stays off GitHub.</p>
 </div>
+<script>
+(function () {
+  var names = { tl: "A person leads, AI inside (top left)", tr: "Agents run it, a person judges (top right)",
+    bl: "AI alone, with checks (bottom left)", br: "A person decides, AI alongside (bottom right)" };
+  function mark(q) {
+    document.querySelectorAll(".q, #maptable tr[data-q]").forEach(function (el) {
+      el.classList.toggle("on", el.dataset.q === q);
+      if (el.tagName === "BUTTON") el.setAttribute("aria-pressed", el.dataset.q === q ? "true" : "false");
+    });
+    document.getElementById("mapstatus").textContent = "Marked: " + names[q] + (q === "bl" ? " (my answer to Q1)." : ". My answer is bottom left.");
+  }
+  document.querySelectorAll(".q").forEach(function (b) { b.addEventListener("click", function () { mark(b.dataset.q); }); });
+  mark("bl");
+})();
+</script>
 </body>
 </html>
