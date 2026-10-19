@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SG Weather Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Mono:wght@500&display=swap">
+<style>
+:root {
+  --bg: #f5f7fa; --panel: #ffffff; --ink: #1e2a4a; --ink-soft: #5a6884; --q-ink: #3a2d68;
+  --rule: #dfe4ec; --accent: #c8364a; --note-bg: #eef2f6;
+  --q-warm: #fbf4fb; --q-warm-line: #dcc2df; --q-cool: #f3f7fa; --q-cool-line: #c4d8e5;
+  --person: #7a55b5; --ai: #2a7fb0; --ok: #258a59; --warn: #bd5f1a; --mark: #f5c542;
+  --font: "Fira Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Fira Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --panel: #1a1f29; --ink: #e6ebf3; --ink-soft: #9aa6bb; --q-ink: #cdbff2; --rule: #2c3442;
+    --accent: #e0566a; --note-bg: #20262f; --q-warm: #241d29; --q-warm-line: #5b4560; --q-cool: #1a2430; --q-cool-line: #3b5670;
+    --person: #9a7bd6; --ai: #3f93c4; --ok: #3aa874; --warn: #d9803d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a1f29; --ink: #e6ebf3; --ink-soft: #9aa6bb; --q-ink: #cdbff2; --rule: #2c3442;
+  --accent: #e0566a; --note-bg: #20262f; --q-warm: #241d29; --q-warm-line: #5b4560; --q-cool: #1a2430; --q-cool-line: #3b5670;
+  --person: #9a7bd6; --ai: #3f93c4; --ok: #3aa874; --warn: #d9803d; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.55; }
+.page { max-width: 920px; margin: 0 auto; padding: 28px 16px 56px; }
+header { border-left: 6px solid var(--accent); padding: 4px 0 4px 16px; margin-bottom: 28px; }
+.badge { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; border-radius: 999px;
+  padding: 4px 14px 4px 10px; font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--mark); }
+h1 { font-size: clamp(28px, 6vw, 40px); margin: 10px 0 4px; line-height: 1.15; }
+.lede { color: var(--ink-soft); margin: 0; max-width: 62ch; }
+nav { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 14px 0 0; font-size: 14px; }
+nav a { color: var(--ink-soft); }
+section { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 22px; margin: 0 0 20px; }
+h2 { font-size: 21px; margin: 0 0 12px; color: var(--q-ink); }
+h3 { font-size: 16px; margin: 18px 0 6px; }
+p, li { max-width: 70ch; }
+figure { margin: 14px 0; }
+figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; }
+figcaption { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+code { font-family: var(--mono); font-size: .92em; }
+a { color: var(--ai); }
+.card { font-family: var(--mono); font-size: 14px; line-height: 1.6; background: var(--note-bg); border-radius: 6px;
+  padding: 14px 16px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.card b { color: var(--q-ink); }
+.meta { font-size: 13.5px; color: var(--ink-soft); }
+.pending { border: 1.5px dashed var(--rule); border-radius: 6px; padding: 12px 14px; color: var(--ink-soft); font-size: 14.5px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+.scroll { overflow-x: auto; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+.step { flex: 1 1 220px; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 14px; }
+.step .k { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+.arrow { align-self: center; color: var(--ink-soft); font-size: 20px; }
+@media (max-width: 560px) { .arrow { display: none; } section { padding: 16px; } }
+.map { display: grid; grid-template-columns: minmax(70px, 150px) 1fr 1fr; gap: 10px; margin: 8px 0 6px; }
+.colh, .rowh { font-weight: 600; font-size: 14px; color: var(--ink-soft); text-align: center; align-self: end; }
+.rowh { align-self: center; }
+.q { position: relative; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; text-align: left; min-height: 150px;
+  padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--q-cool-line); background: var(--q-cool); color: var(--ink);
+  font: inherit; cursor: pointer; }
+.q.warm { background: var(--q-warm); border-color: var(--q-warm-line); }
+.q:hover { border-style: dashed; }
+.q:focus-visible { outline: 3px solid var(--ai); outline-offset: 2px; }
+.q .qt { font-weight: 600; color: var(--q-ink); font-size: 16px; }
+.q .qs { font-size: 13.5px; color: var(--ink-soft); }
+.q svg { width: 120px; height: 40px; margin-top: auto; }
+.q .pin { display: none; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.q.on { border: 3px solid var(--accent); }
+.q.on .pin { display: inline-block; }
+#maptable tr.on td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.status { font-size: 14px; }
+.todo { color: var(--warn); }
+@media (max-width: 560px) { .map { grid-template-columns: 1fr 1fr; } .map > div:first-child, .rowh { display: none; } .colh { font-size: 12.5px; } .q { min-height: 130px; padding: 10px; } .q .qt { font-size: 14.5px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <span class="badge">Problem Set 5 · Earlier attempt (archived)</span>
+    <h1>SG Weather Watch</h1>
+    <p class="lede">A Zapier agent with one trigger and one action. When BBC Weather posts a new Singapore forecast, it emails the forecast to me.</p>
+    <nav>
+      <a href="#card">Agent card</a><a href="#zap">The Zap</a><a href="#runs">Runs</a><a href="#tricky">Tricky case &amp; fix</a>
+      <a href="#map">Map</a><a href="#q1">Q1</a><a href="#log">Collaboration log</a><a href="#reflection">Reflection</a>
+    </nav>
+  </header>
+
+  <section id="card">
+    <h2>My agent card</h2>
+    <pre class="card"><b>My agent card | SG Weather Watch | finished Mon 19 Oct 2026, 23:15 SGT</b>
+<b>1. The job:</b> Emails the latest Singapore weather forecast (sky, min/max temperature, humidity, wind, UV) to a student who commutes to SMU (me), each time BBC Weather updates it, so I know whether to carry an umbrella.
+<b>2. The trigger:</b> RSS by Zapier "New Item in Feed" finds a new item in BBC Weather's 3-day Singapore feed (checked every 15 minutes on the free plan).
+<b>3. The tools:</b> RSS by Zapier: New Item in Feed (reads the feed only). Gmail: Send Email (to me only). No other apps or actions.
+<b>4. It must never:</b> email anyone but me. The Gmail "To" field is typed in as my own address, never mapped from the feed, and CC and BCC are left empty.
+<b>5. Where a person checks:</b> I (the student) read each email when it arrives and check it against Zap history and the BBC Weather page every evening, until I turn the Zap off after class on Wed 21 Oct.</pre>
+    <p class="meta">Written before the Zap's first run. I set the 6-hour cadence of my original idea aside: Zapier's free Schedule trigger has no "every 6 hours" option, and fetching weather on a schedule would need a third step.</p>
+  </section>
+
+  <section id="zap">
+    <h2>The Zap</h2>
+    <div class="flow">
+      <div class="step"><div class="k">Trigger</div><b>RSS by Zapier</b> · New Item in Feed<br><span class="meta">BBC Weather 3-day forecast, Singapore (location 1880252)</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="step"><div class="k">Action</div><b>Gmail</b> · Send Email<br><span class="meta">To: my own personal address · Subject: the forecast title · Body: the forecast description + link</span></div>
+    </div>
+    <p class="meta">Free plan, free apps, no card. A personal Google account, not my SMU one.</p>
+  </section>
+
+  <section id="runs">
+    <h2>Runs, checked against Zap history</h2>
+    <p>Published v1 at about 23:20 SGT on Mon 19 Oct. The trigger, set up against the live BBC feed:</p>
+    <figure><img src="screens/01-v1-trigger.jpg" alt="RSS by Zapier trigger set to the BBC Singapore 3-day forecast feed" loading="lazy"><figcaption>Trigger: New Item in Feed, BBC location 1880252.</figcaption></figure>
+    <div class="pending">Run log: as of Mon 19 Oct 23:38 SGT, Zap history shows no runs yet, because BBC had not posted a new Singapore forecast since 17:00 SGT. Screenshots of the runs, each checked against Zap history, will be added once the Zap has fired.</div>
+  </section>
+
+  <section id="tricky">
+    <h2>Tricky case &amp; fix</h2>
+    <h3>The case: a broken feed URL</h3>
+    <p>I point the trigger at a BBC location that does not exist (ID <code>0000000</code> instead of Singapore's <code>1880252</code>). This is what would happen if BBC moved or retired the feed. With a wrong ID, BBC answers "404 Not Found" and sends no RSS.</p>
+    <h3>What I expected, written before the run (Mon 19 Oct 2026, 23:23 SGT, git commit d9629d2)</h3>
+    <ul>
+      <li>The trigger fails with a "feed not found" or 404 error, and Zapier sends <b>no email</b>.</li>
+      <li>The real risk is a <b>silent failure</b>. Since my agent normally stays quiet between BBC updates, an empty inbox looks the same whether the Zap is working or broken. I expect Zapier to show the error in Zap history and the editor, but not to tell me straight away.</li>
+    </ul>
+    <h3>What happened (v2, published 23:25 SGT)</h3>
+    <ul>
+      <li>The editor's Test tab <b>still showed the old cached Singapore records</b>, so the Zap looked fine until I pressed "Find new records". Then it showed: <i>Unable to pull feeds. The app returned "Not Found"</i>.</li>
+      <li>Once published, the Zap polled the bad feed and Zapier <b>switched the Zap off</b> with the banner <i>Zap turned off due to a partner issue</i>.</li>
+      <li><b>Zap history recorded no run at all</b> for this failure, and no forecast email was sent. My expectation was half right: no email, as I expected. But the failure did not show in Zap history either, so checking history alone would not catch it. A person has to check that the Zap is still on.</li>
+      <li>Zapier's default error alert (set to "Immediately") <b>did email me</b> that the Zap had been turned off. So the person in the loop gets a signal, but it comes from Zapier, not from the agent, and only if I read it.</li>
+    </ul>
+    <figure><img src="screens/02-tricky-error.jpg" alt="Zapier trigger test error: Unable to pull feeds, the app returned Not Found" loading="lazy"><figcaption>The trigger test against location 0000000.</figcaption></figure>
+    <figure><img src="screens/04-tricky-turned-off.jpg" alt="Zapier banner: Zap turned off due to a partner issue" loading="lazy"><figcaption>Zapier turned the Zap off.</figcaption></figure>
+    <figure><img src="screens/03-tricky-no-runs.jpg" alt="Zap runs panel: There are no runs for this time period" loading="lazy"><figcaption>Zap runs: nothing logged for the failure.</figcaption></figure>
+    <h3>The fix and the rerun (v3, published 23:28 SGT)</h3>
+    <ul>
+      <li><b>Fix:</b> restored the Singapore location ID <code>1880252</code>, pressed "Find new records" to pull live records rather than trusting the cached sample, and published v3, which turned the Zap back on.</li>
+      <li><b>Rerun:</b> the same trigger test now returns the live Singapore forecast items, and the Zap shows as on.</li>
+      <li><b>Lesson for the person in the loop:</b> an empty inbox is not proof the agent is working. My evening check (card line 5) now starts with "is the Zap still on?" before I compare emails with Zap history.</li>
+    </ul>
+    <figure><img src="screens/05-fix-records.jpg" alt="Trigger test after the fix returns feed records" loading="lazy"><figcaption>After the fix: live records pulled again.</figcaption></figure>
+  </section>
+
+  <section id="map">
+    <h2>Where it sits on our map</h2>
+    <p class="meta">Tap a quadrant to try it: the map and the table mark it. Nothing is saved. My answer, <b>AI alone, with checks</b>, is marked when the page loads.</p>
+    <div class="map" id="mapgrid">
+      <div></div>
+      <div class="colh">Work with a right answer</div>
+      <div class="colh">Work with no single right answer</div>
+      <div class="rowh">Work that people and AI must do together</div>
+      <button class="q warm" data-q="tl" type="button"><span class="qt">A person leads, AI inside</span><span class="qs">The person leads and AI works inside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="40" cy="20" r="14" fill="var(--person)"/><circle cx="66" cy="20" r="8" fill="var(--ai)"/></svg><span class="pin">SG Weather Watch</span></button>
+      <button class="q cool" data-q="tr" type="button"><span class="qt">Agents run it, a person judges</span><span class="qs">Agents run the process and a person judges inside it.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="30" cy="20" r="8" fill="var(--ai)"/><circle cx="52" cy="20" r="8" fill="var(--ai)"/><circle cx="80" cy="20" r="12" fill="var(--person)"/></svg><span class="pin">SG Weather Watch</span></button>
+      <div class="rowh">Work that either of them can do alone</div>
+      <button class="q cool" data-q="bl" type="button"><span class="qt">AI alone, with checks</span><span class="qs">AI does it, with spot checks.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--ai)"/><circle cx="84" cy="20" r="6" fill="none" stroke="var(--person)" stroke-width="3"/></svg><span class="pin">SG Weather Watch</span></button>
+      <button class="q warm" data-q="br" type="button"><span class="qt">A person decides, AI alongside</span><span class="qs">A person decides with AI alongside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--person)"/><circle cx="80" cy="20" r="9" fill="var(--ai)"/></svg><span class="pin">SG Weather Watch</span></button>
+    </div>
+    <p class="status" id="mapstatus" aria-live="polite"></p>
+    <div class="scroll">
+    <table id="maptable">
+      <thead><tr><th>Quadrant</th><th>A right answer?</th><th>Together or alone?</th><th>The person in the loop</th></tr></thead>
+      <tbody>
+        <tr data-q="tl"><td><b>A person leads, AI inside</b><br><span class="meta">top left</span></td><td>A right answer</td><td>Must do it together</td><td>The person leads and AI works inside; the person signs off what AI has checked.</td></tr>
+        <tr data-q="tr"><td><b>Agents run it, a person judges</b><br><span class="meta">top right</span></td><td>No single right answer</td><td>Must do it together</td><td>Agents run the process, and a person judges inside it at the judgement points.</td></tr>
+        <tr data-q="bl"><td><b>AI alone, with checks</b><br><span class="meta">bottom left</span></td><td>A right answer</td><td>Either can do it alone</td><td>AI does it, with spot checks; a person reads its report or audits its log.</td></tr>
+        <tr data-q="br"><td><b>A person decides, AI alongside</b><br><span class="meta">bottom right</span></td><td>No single right answer</td><td>Either can do it alone</td><td>A person decides with AI alongside, which drafts the options and checks the facts.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="meta">Purple stands for the person and blue for AI, as in our Week 7 deck.</p>
+  </section>
+
+  <section id="q1">
+    <h2>Q1 · Where does my agent sit, and what does that mean for the person in the loop?</h2>
+    <h3>(a) My quadrant</h3>
+    <p><b>AI alone, with checks</b> (bottom left).</p>
+    <h3>(b) The two questions</h3>
+    <p><b>Work with a right answer.</b> Every email can be checked against a source of truth: the forecast either matches BBC Weather's Singapore page at that time or it doesn't. The tricky case showed this too: with the wrong location ID there was a clear wrong answer (a 404), not a matter of taste. The setup test email showed this. Its subject, "Tonight: Thundery Showers, Minimum Temperature: 28°C (82°F)", matched word for word the BBC feed I fetched separately at 23:00 SGT, so I could mark it right without any judgement call.</p>
+    <p><b>Work that either of them can do alone.</b> I could look up the forecast myself in a minute, and the Zap does it with no human step at all: one trigger, one action, no approval in between. Nothing in the job needs a person and AI working on the same item at once.</p>
+    <h3>(c) The person in the loop</h3>
+    <p><b>Where I stay at the gate:</b> not before each email, but after. In my evening check I confirm the Zap is still on, compare each email with Zap history, and spot-check one forecast against bbc.co.uk/weather. <b>What the agent may do alone:</b> read one public feed and email one fixed address, mine. The Gmail "To" field is typed in, never mapped, so it cannot reach anyone else. <b>What would move it:</b> if it emailed classmates or clients, I would want to approve before sending, which moves it to <i>A person leads, AI inside</i>. If it advised on choices with no single right answer (for example "should we hold the outdoor event tomorrow?"), it moves to <i>A person decides, AI alongside</i>, with me making the call.</p>
+    <h3>(d) My group's view</h3>
+    <p>Our group's board (<a href="board.html">board.html</a>) puts the closest task to mine, <i>Stocks: pull daily closing prices</i>, in <b>AI alone, with checks</b>, because it is "a fixed, checkable fact" that a script fetches with a spot check. I agree, and my agent belongs beside it. The group put its agent-style tasks (screening stocks for a watchlist, gathering sources for a literature review, tailoring a CV per job) in <b>Agents run it, a person judges</b>, because there is no single right list. I agree for those too.</p>
+<p>Where I would answer differently is the <b>together or alone</b> question. The group answered it by asking whether a person must be inside each run. My tricky case shows that "alone" still needs a person outside the run: when the feed broke, the agent could not notice, Zap history logged nothing, and only Zapier's own alert email told me. So I keep my agent in "alone", but I'd add that "alone" agents need a named person who checks they are still running, not only that their output is right. I would also split the classmates' agents by the <b>right answer</b> question. A weather or "email matches a search" alert has a right answer. A "morning headlines" digest that chooses which stories matter does not, which would move it towards the right-hand column.</p>
+  </section>
+
+  <section id="log">
+    <h2>Collaboration log</h2>
+    <div class="scroll"><table>
+      <tbody>
+        <tr><th scope="row">What I delegated to AI</th><td>I used Claude (in the Claude desktop app, driving my Chrome) to compare Zapier's free options for a Singapore weather agent, find a free weather feed (BBC Weather RSS), click through the Zap set-up, draft this page and the card, create the GitHub repo and deploy it on Vercel. I did the Google sign-in and approved each step myself.</td></tr>
+        <tr><th scope="row">What I checked, and how</th><td>I checked that the Zap has one trigger and one action and uses only free apps (RSS by Zapier, Gmail), with no card added. I made sure the Gmail "To" field is my own personal address, typed in rather than mapped, with CC and BCC empty. I compared the test email against the raw BBC feed. I confirmed the broken-URL case in the editor, in Zap runs and in Zapier's alert email. I checked the page and repo load without signing in.</td></tr>
+        <tr><th scope="row">One AI error I caught</th><td>The AI stamped my tricky-case expectation "23:35 SGT", but it was written at 23:23, before the 23:25 run. I caught it by comparing with the git commit times and corrected it, because a wrong stamp would have made the expectation look as if it came <i>after</i> the run. A second near-miss: the editor kept showing old cached Singapore records after I broke the URL, so the AI's first read was that the trigger still worked. Pressing "Find new records" showed the real 404.</td></tr>
+        <tr><th scope="row">Time and cost</th><td>About 45 minutes on Mon 19 Oct (23:00–23:45 SGT) for the build, tricky case, fix and page. The cost is $0: Zapier free plan (a Pro trial switched on, but I used only free-plan features), Vercel Hobby and GitHub Free, with no card added anywhere.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="reflection">
+    <h2>Reflection</h2>
+    <p>My agent fitted the job well: fetching a checkable forecast from one public feed and emailing it only to me is narrow, rule-bound work that a one-trigger, one-action Zap can do alone. It failed where a quiet agent is weakest: when the feed broke, it neither emailed nor logged a run, so silence looked the same as working, and only Zapier's own alert (and then the Zap turning off) gave it away. Next time I would add a regular "still alive" check, for example a weekly scheduled email that confirms the agent is on, and I would pick a feed that posts one item per update rather than three.</p>
+  </section>
+
+  <p class="meta">Our group's interactive map board from Week 7 is at <a href="board.html">board.html</a>. This page holds no client data or keys, email addresses are cropped from the screenshots, and the Zap-history JSON stays off GitHub.</p>
+</div>
+<script>
+(function () {
+  var names = { tl: "A person leads, AI inside (top left)", tr: "Agents run it, a person judges (top right)",
+    bl: "AI alone, with checks (bottom left)", br: "A person decides, AI alongside (bottom right)" };
+  function mark(q) {
+    document.querySelectorAll(".q, #maptable tr[data-q]").forEach(function (el) {
+      el.classList.toggle("on", el.dataset.q === q);
+      if (el.tagName === "BUTTON") el.setAttribute("aria-pressed", el.dataset.q === q ? "true" : "false");
+    });
+    document.getElementById("mapstatus").textContent = "Marked: " + names[q] + (q === "bl" ? ", my answer to Q1." : ". My answer is bottom left.");
+  }
+  document.querySelectorAll(".q").forEach(function (b) { b.addEventListener("click", function () { mark(b.dataset.q); }); });
+  mark("bl");
+})();
+</script>
+</body>
+</html>

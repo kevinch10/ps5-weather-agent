@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SG Weather Watch</title>
+<title>SG PSI &amp; Weather Update</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Mono:wght@500&display=swap">
 <style>
@@ -46,19 +46,24 @@ p, li { max-width: 70ch; }
 figure { margin: 14px 0; }
 figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; }
 figcaption { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.figs figure { margin: 0; }
 code { font-family: var(--mono); font-size: .92em; }
 a { color: var(--ai); }
 .card { font-family: var(--mono); font-size: 14px; line-height: 1.6; background: var(--note-bg); border-radius: 6px;
   padding: 14px 16px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
 .card b { color: var(--q-ink); }
 .meta { font-size: 13.5px; color: var(--ink-soft); }
-.pending { border: 1.5px dashed var(--rule); border-radius: 6px; padding: 12px 14px; color: var(--ink-soft); font-size: 14.5px; }
+.note { border-left: 4px solid var(--warn); background: var(--note-bg); border-radius: 4px; padding: 10px 14px; font-size: 14.5px; margin: 12px 0; }
+.ok { color: var(--ok); font-weight: 600; }
+.bad { color: var(--accent); font-weight: 600; }
 table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--rule); }
 th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .scroll { overflow-x: auto; }
 .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
-.step { flex: 1 1 220px; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 14px; }
+.step { flex: 1 1 170px; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 14px; }
 .step .k { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
 .arrow { align-self: center; color: var(--ink-soft); font-size: 20px; }
 @media (max-width: 560px) { .arrow { display: none; } section { padding: 16px; } }
@@ -79,7 +84,6 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
 .q.on .pin { display: inline-block; }
 #maptable tr.on td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .status { font-size: 14px; }
-.todo { color: var(--warn); }
 @media (max-width: 560px) { .map { grid-template-columns: 1fr 1fr; } .map > div:first-child, .rowh { display: none; } .colh { font-size: 12.5px; } .q { min-height: 130px; padding: 10px; } .q .qt { font-size: 14.5px; } }
 </style>
 </head>
@@ -87,8 +91,8 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
 <div class="page">
   <header>
     <span class="badge">Problem Set 5 · My agent</span>
-    <h1>SG Weather Watch</h1>
-    <p class="lede">A Zapier agent with one trigger and one action. When BBC Weather posts a new Singapore forecast, it emails the forecast to me.</p>
+    <h1>SG PSI &amp; Weather Update</h1>
+    <p class="lede">A Zapier agent that emails me Singapore's official air quality (24-hour PSI and PM2.5 for five regions) and the weather four times a day, at 00:00, 06:00, 12:00 and 18:00 SGT. All data comes from NEA's public feeds on data.gov.sg.</p>
     <nav>
       <a href="#card">Agent card</a><a href="#zap">The Zap</a><a href="#runs">Runs</a><a href="#tricky">Tricky case &amp; fix</a>
       <a href="#map">Map</a><a href="#q1">Q1</a><a href="#log">Collaboration log</a><a href="#reflection">Reflection</a>
@@ -97,58 +101,92 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
 
   <section id="card">
     <h2>My agent card</h2>
-    <pre class="card"><b>My agent card | SG Weather Watch | finished Mon 19 Oct 2026, 23:15 SGT</b>
-<b>1. The job:</b> Emails the latest Singapore weather forecast (sky, min/max temperature, humidity, wind, UV) to a student who commutes to SMU (me), each time BBC Weather updates it, so I know whether to carry an umbrella.
-<b>2. The trigger:</b> RSS by Zapier "New Item in Feed" finds a new item in BBC Weather's 3-day Singapore feed (checked every 15 minutes on the free plan).
-<b>3. The tools:</b> RSS by Zapier: New Item in Feed (reads the feed only). Gmail: Send Email (to me only). No other apps or actions.
-<b>4. It must never:</b> email anyone but me. The Gmail "To" field is typed in as my own address, never mapped from the feed, and CC and BCC are left empty.
-<b>5. Where a person checks:</b> I (the student) read each email when it arrives and check it against Zap history and the BBC Weather page every evening, until I turn the Zap off after class on Wed 21 Oct.</pre>
-    <p class="meta">Written before the Zap's first run. I set the 6-hour cadence of my original idea aside: Zapier's free Schedule trigger has no "every 6 hours" option, and fetching weather on a schedule would need a third step.</p>
+    <pre class="card"><b>My agent card | SG PSI &amp; Weather Update | finished Tue 20 Oct 2026, 01:25 SGT (v3)</b>
+<b>1. The job:</b> Emails a Singapore commuter (me, a student going to SMU) the official 24-hour PSI and PM2.5 for North, South, East, West and Central, plus the current temperature and the 6-hour forecast, so I know whether to wear a mask or carry an umbrella.
+<b>2. The trigger:</b> Schedule by Zapier "Every Hour" (Asia/Singapore). A filter lets only the 00:00, 06:00, 12:00 and 18:00 runs continue.
+<b>3. The tools:</b> Schedule by Zapier (trigger). Filter by Zapier. Code by Zapier (JavaScript that only reads three public NEA endpoints on data.gov.sg: psi, twenty-four-hr-forecast, air-temperature). Email by Zapier: Send Outbound Email (to me only).
+<b>4. It must never:</b> email anyone but me. The "To" field is typed in as my own address, never mapped from data, and CC and BCC are left empty.
+<b>5. Where a person checks:</b> I (the student) read each email when it arrives. Once a day I confirm the Zap is still on, scan Zap history for anything Errored, and compare one email with NEA's figure for the same hour, until I turn the Zap off after class on Wed 21 Oct.</pre>
+    <p class="note"><b>Two honest notes.</b> (1) I set the job on Wed 14 Oct, 14:30 SGT ("PSI updates for Singapore, a trigger every 6 hours, one email to myself"), but I only wrote this five-line card on 20 Oct, after the build, so it was <i>not</i> written before the first run as the brief asks. (2) The brief asks for one trigger and one action on the free plan. My Zap has four steps, because Zapier's schedule has no "every 6 hours" option (so a filter is needed) and an email step cannot fetch data by itself (so a code step is needed). These run on Zapier's 14-day trial, and the editor warns that the Zap "uses paid features". My earlier one-trigger, one-action attempt, <a href="sg-weather-watch.html">SG Weather Watch</a> (RSS → Gmail), followed the rules but never fired (0 runs), so I hand in this agent instead.</p>
   </section>
 
   <section id="zap">
     <h2>The Zap</h2>
     <div class="flow">
-      <div class="step"><div class="k">Trigger</div><b>RSS by Zapier</b> · New Item in Feed<br><span class="meta">BBC Weather 3-day forecast, Singapore (location 1880252)</span></div>
+      <div class="step"><div class="k">1 · Trigger</div><b>Schedule by Zapier</b> · Every Hour<br><span class="meta">Timezone Asia/Singapore, weekends on</span></div>
       <div class="arrow" aria-hidden="true">→</div>
-      <div class="step"><div class="k">Action</div><b>Gmail</b> · Send Email<br><span class="meta">To: my own personal address · Subject: the forecast title · Body: the forecast description + link</span></div>
+      <div class="step"><div class="k">2 · Filter</div><b>Filter by Zapier</b><br><span class="meta">Time Hour exactly matches 6, or 12, or 0</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="step"><div class="k">3 · Fetch</div><b>Code by Zapier</b> · Run JavaScript<br><span class="meta">Reads NEA PSI, 24-hr forecast and air temperature; writes the subject and body</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="step"><div class="k">4 · Action</div><b>Email by Zapier</b> · Send Outbound Email<br><span class="meta">To: my own address (typed in) · Subject and body from step 3</span></div>
     </div>
-    <p class="meta">Free plan, free apps, no card. A personal Google account, not my SMU one.</p>
+    <figure><img src="screens/psi/00-zap-four-steps.jpg" alt="Zapier editor showing four steps: Every Hour, Filter conditions, Run Javascript, Send Outbound Email, with the trial paid-features banner" loading="lazy"><figcaption>The published Zap (v3), with the banner that the four-step Zap uses trial features.</figcaption></figure>
+    <h3>Versions</h3>
+    <div class="scroll"><table>
+      <thead><tr><th>Version</th><th>Published (SGT)</th><th>What changed</th></tr></thead>
+      <tbody>
+        <tr><td>v1</td><td class="num">Wed 14 Oct, ~15:00</td><td>PSI for five regions, every 6 hours.</td></tr>
+        <tr><td>v2 "Add Singapore weather"</td><td class="num">Tue 20 Oct, 00:46</td><td>Adds current temperature, the 24-hour outlook and the 6-hour regional forecast.</td></tr>
+        <tr><td>v3 "Fix: send email even when PSI data missing"</td><td class="num">Tue 20 Oct, 01:25</td><td>The fix from the tricky case (below).</td></tr>
+      </tbody>
+    </table></div>
   </section>
 
   <section id="runs">
     <h2>Runs, checked against Zap history</h2>
-    <p>Published v1 at about 23:20 SGT on Mon 19 Oct. The trigger, set up against the live BBC feed:</p>
-    <figure><img src="screens/01-v1-trigger.jpg" alt="RSS by Zapier trigger set to the BBC Singapore 3-day forecast feed" loading="lazy"><figcaption>Trigger: New Item in Feed, BBC location 1880252.</figcaption></figure>
-    <div class="pending">Run log: as of Mon 19 Oct 23:38 SGT, Zap history shows no runs yet, because BBC had not posted a new Singapore forecast since 17:00 SGT. Screenshots of the runs, each checked against Zap history, will be added once the Zap has fired.</div>
+    <p>From the first scheduled run (Wed 14 Oct, 18:00) to Tue 20 Oct, 01:00 SGT, Zap history holds <b>134 runs and no errors</b>: <b>22 scheduled emails</b>, which is exactly the number expected (one on 14 Oct, four a day from 15 to 19 Oct, one at midnight on 20 Oct), 2 test runs, and 110 <i>Filtered</i> runs, the hourly runs the filter stopped on purpose.</p>
+    <p>For three scheduled runs I compared every number in the email (PSI and PM2.5 for five regions) with NEA's own record for the same hour, which I fetched separately from data.gov.sg (<code>/v2/real-time/api/psi?date=…</code>).</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Run (SGT)</th><th>Zap history</th><th>Reading in the email</th><th>Highest PSI</th><th>vs NEA record</th></tr></thead>
+      <tbody>
+        <tr><td class="num">Mon 19 Oct, 12:00</td><td><span class="ok">Successful</span>, 2 tasks</td><td>12:00 pm</td><td>122 West (Unhealthy)</td><td><span class="ok">10 of 10 match</span></td></tr>
+        <tr><td class="num">Mon 19 Oct, 18:00</td><td><span class="ok">Successful</span>, 2 tasks</td><td>6:00 pm</td><td>114 West (Unhealthy)</td><td><span class="ok">10 of 10 match</span></td></tr>
+        <tr><td class="num">Tue 20 Oct, 00:00</td><td><span class="ok">Successful</span>, 2 tasks</td><td>11:00 pm (19 Oct)</td><td>115 West (Unhealthy)</td><td><span class="ok">10 of 10 match</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="meta">What I noticed: the midnight run used the 11 pm reading, because NEA had not yet published the midnight hour when the Zap ran at 00:00:29. The email labels the reading "as of 11:00 pm", so it is accurate, but up to an hour old.</p>
+    <div class="figs">
+      <figure><img src="screens/psi/01-run1-19oct-1200-status.jpg" alt="Zap run 19 Oct 12:00, Successful" loading="lazy"><figcaption>Run 1 · 19 Oct 12:00 · Successful</figcaption></figure>
+      <figure><img src="screens/psi/02-run1-19oct-1200-email.jpg" alt="Email step data for run 1: PSI 122 Unhealthy" loading="lazy"><figcaption>Run 1 · the email it sent</figcaption></figure>
+      <figure><img src="screens/psi/03-run2-19oct-1800-status.jpg" alt="Zap run 19 Oct 18:00, Successful" loading="lazy"><figcaption>Run 2 · 19 Oct 18:00 · Successful</figcaption></figure>
+      <figure><img src="screens/psi/04-run2-19oct-1800-email.jpg" alt="Email step data for run 2: PSI 114 Unhealthy" loading="lazy"><figcaption>Run 2 · the email it sent</figcaption></figure>
+      <figure><img src="screens/psi/05-run3-20oct-0000-status.jpg" alt="Zap run 20 Oct 00:00, Successful" loading="lazy"><figcaption>Run 3 · 20 Oct 00:00 · Successful</figcaption></figure>
+      <figure><img src="screens/psi/06-run3-20oct-0000-email.jpg" alt="Email step data for run 3: PSI 115 Unhealthy" loading="lazy"><figcaption>Run 3 · the email it sent</figcaption></figure>
+    </div>
+    <h3>With the weather (v2 test run, 20 Oct 00:48)</h3>
+    <figure><img src="screens/psi/12-weather-test-run-email.jpg" alt="Email with PSI and a weather section: 28.9 degrees, thundery showers, forecast by region" loading="lazy"><figcaption>v2 adds a weather section: 28.9°C average across 18 NEA stations, the 24-hour outlook and the 6-hour forecast by region.</figcaption></figure>
   </section>
 
   <section id="tricky">
     <h2>Tricky case &amp; fix</h2>
-    <h3>The case: a broken feed URL</h3>
-    <p>I point the trigger at a BBC location that does not exist (ID <code>0000000</code> instead of Singapore's <code>1880252</code>). This is what would happen if BBC moved or retired the feed. With a wrong ID, BBC answers "404 Not Found" and sends no RSS.</p>
-    <h3>What I expected, written before the run (Mon 19 Oct 2026, 23:23 SGT, git commit d9629d2)</h3>
+    <h3>The case: NEA has no PSI reading</h3>
+    <p>When data.gov.sg has no PSI data for the time asked, it does not send an empty list. It answers <code>{"code":17, "name":"REAL_TIME_API_DATA_NOT_FOUND", "data":null}</code>. I simulated this by asking for a date with no data (<code>psi?date=2030-01-01</code>) in a draft of the Zap, so the live Zap was never touched.</p>
+    <h3>What I expected, written before the run (Tue 20 Oct 2026, 01:16 SGT)</h3>
     <ul>
-      <li>The trigger fails with a "feed not found" or 404 error, and Zapier sends <b>no email</b>.</li>
-      <li>The real risk is a <b>silent failure</b>. Since my agent normally stays quiet between BBC updates, an empty inbox looks the same whether the Zap is working or broken. I expect Zapier to show the error in Zap history and the editor, but not to tell me straight away.</li>
+      <li>The code step reads <code>psiRes.data.items[0]</code> with no guard, so it should throw a TypeError ("Cannot read properties of null").</li>
+      <li>The run should show as <b>Errored</b> at step 3, step 4 should never run, and <b>no email</b> should be sent.</li>
+      <li>The weather part is already protected but the PSI part is not, so one missing feed stops the whole update, weather included.</li>
     </ul>
-    <h3>What happened (v2, published 23:25 SGT)</h3>
+    <h3>What happened (test run 01:18:20 SGT)</h3>
+    <p>Exactly as expected: <span class="bad">Errored</span> at step 3 with <i>TypeError: Cannot read properties of null (reading 'items') at line 3</i>, and step 4 <i>Skipped</i>. No email was sent. In real use I would get silence, and only Zap history would show why.</p>
+    <div class="figs">
+      <figure><img src="screens/psi/07-tricky-errored.jpg" alt="Zap run Errored: TypeError cannot read properties of null reading items" loading="lazy"><figcaption>Errored at step 3.</figcaption></figure>
+      <figure><img src="screens/psi/08-tricky-email-skipped.jpg" alt="Step 4 Send Outbound Email Skipped; code shows psi?date=2030-01-01" loading="lazy"><figcaption>The email step was skipped. The test date is visible in the code.</figcaption></figure>
+    </div>
+    <h3>The fix (v3)</h3>
     <ul>
-      <li>The editor's Test tab <b>still showed the old cached Singapore records</b>, so the Zap looked fine until I pressed "Find new records". Then it showed: <i>Unable to pull feeds. The app returned "Not Found"</i>.</li>
-      <li>Once published, the Zap polled the bad feed and Zapier <b>switched the Zap off</b> with the banner <i>Zap turned off due to a partner issue</i>.</li>
-      <li><b>Zap history recorded no run at all</b> for this failure, and no forecast email was sent. My expectation was half right: no email, as I expected. But the failure did not show in Zap history either, so checking history alone would not catch it. A person has to check that the Zap is still on.</li>
-      <li>Zapier's default error alert (set to "Immediately") <b>did email me</b> that the Zap had been turned off. So the person in the loop gets a signal, but it comes from Zapier, not from the agent, and only if I read it.</li>
+      <li>The PSI request now has <code>.catch(() =&gt; null)</code> and is read with optional chaining (<code>psiRes?.data?.items?.[0]</code>), so a missing or broken feed cannot crash the step.</li>
+      <li>A <code>hasPsi</code> check confirms all five regions have numbers. If not, the email still goes out with the subject <i>"Singapore PSI unavailable"</i>, NEA's own message ("Data not found") and the full weather section.</li>
+      <li>The PSI request sits in one <code>PSI_PATH</code> line, so the case can be replayed by changing that one line.</li>
     </ul>
-    <figure><img src="screens/02-tricky-error.jpg" alt="Zapier trigger test error: Unable to pull feeds, the app returned Not Found" loading="lazy"><figcaption>The trigger test against location 0000000.</figcaption></figure>
-    <figure><img src="screens/04-tricky-turned-off.jpg" alt="Zapier banner: Zap turned off due to a partner issue" loading="lazy"><figcaption>Zapier turned the Zap off.</figcaption></figure>
-    <figure><img src="screens/03-tricky-no-runs.jpg" alt="Zap runs panel: There are no runs for this time period" loading="lazy"><figcaption>Zap runs: nothing logged for the failure.</figcaption></figure>
-    <h3>The fix and the rerun (v3, published 23:28 SGT)</h3>
-    <ul>
-      <li><b>Fix:</b> restored the Singapore location ID <code>1880252</code>, pressed "Find new records" to pull live records rather than trusting the cached sample, and published v3, which turned the Zap back on.</li>
-      <li><b>Rerun:</b> the same trigger test now returns the live Singapore forecast items, and the Zap shows as on.</li>
-      <li><b>Lesson for the person in the loop:</b> an empty inbox is not proof the agent is working. My evening check (card line 5) now starts with "is the Zap still on?" before I compare emails with Zap history.</li>
-    </ul>
-    <figure><img src="screens/05-fix-records.jpg" alt="Trigger test after the fix returns feed records" loading="lazy"><figcaption>After the fix: live records pulled again.</figcaption></figure>
+    <h3>The rerun of the same case (test run 01:21:34 SGT)</h3>
+    <p><span class="ok">Successful</span>, all four steps. The email arrived with the subject <i>"Singapore PSI unavailable | 28.8°C, Thundery Showers - 20 Oct 2026, 1:21 am"</i> and the body <i>"No PSI reading available from NEA right now (data.gov.sg said: Data not found). The next update will try again in 6 hours."</i>, followed by the weather. Then I set <code>PSI_PATH</code> back to live data, tested the step (a normal email with highest PSI 117), published v3 and checked that the live code no longer has the test date.</p>
+    <div class="figs">
+      <figure><img src="screens/psi/09-fix-rerun-successful.jpg" alt="Zap run Successful at 01:21:34" loading="lazy"><figcaption>The rerun: Successful.</figcaption></figure>
+      <figure><img src="screens/psi/10-fix-rerun-email.jpg" alt="Email: Singapore PSI unavailable, with the weather section" loading="lazy"><figcaption>The "PSI unavailable" email it sent instead of failing.</figcaption></figure>
+    </div>
+    <figure><img src="screens/psi/11-history-errored-then-fixed.jpg" alt="Zap history: Errored test run at 01:18, then Successful test run at 01:21" loading="lazy"><figcaption>Zap history: the Errored tricky case (01:18), then the fixed rerun (01:21).</figcaption></figure>
   </section>
 
   <section id="map">
@@ -159,11 +197,11 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
       <div class="colh">Work with a right answer</div>
       <div class="colh">Work with no single right answer</div>
       <div class="rowh">Work that people and AI must do together</div>
-      <button class="q warm" data-q="tl" type="button"><span class="qt">A person leads, AI inside</span><span class="qs">The person leads and AI works inside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="40" cy="20" r="14" fill="var(--person)"/><circle cx="66" cy="20" r="8" fill="var(--ai)"/></svg><span class="pin">SG Weather Watch</span></button>
-      <button class="q cool" data-q="tr" type="button"><span class="qt">Agents run it, a person judges</span><span class="qs">Agents run the process and a person judges inside it.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="30" cy="20" r="8" fill="var(--ai)"/><circle cx="52" cy="20" r="8" fill="var(--ai)"/><circle cx="80" cy="20" r="12" fill="var(--person)"/></svg><span class="pin">SG Weather Watch</span></button>
+      <button class="q warm" data-q="tl" type="button"><span class="qt">A person leads, AI inside</span><span class="qs">The person leads and AI works inside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="40" cy="20" r="14" fill="var(--person)"/><circle cx="66" cy="20" r="8" fill="var(--ai)"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
+      <button class="q cool" data-q="tr" type="button"><span class="qt">Agents run it, a person judges</span><span class="qs">Agents run the process and a person judges inside it.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="30" cy="20" r="8" fill="var(--ai)"/><circle cx="52" cy="20" r="8" fill="var(--ai)"/><circle cx="80" cy="20" r="12" fill="var(--person)"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
       <div class="rowh">Work that either of them can do alone</div>
-      <button class="q cool" data-q="bl" type="button"><span class="qt">AI alone, with checks</span><span class="qs">AI does it, with spot checks.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--ai)"/><circle cx="84" cy="20" r="6" fill="none" stroke="var(--person)" stroke-width="3"/></svg><span class="pin">SG Weather Watch</span></button>
-      <button class="q warm" data-q="br" type="button"><span class="qt">A person decides, AI alongside</span><span class="qs">A person decides with AI alongside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--person)"/><circle cx="80" cy="20" r="9" fill="var(--ai)"/></svg><span class="pin">SG Weather Watch</span></button>
+      <button class="q cool" data-q="bl" type="button"><span class="qt">AI alone, with checks</span><span class="qs">AI does it, with spot checks.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--ai)"/><circle cx="84" cy="20" r="6" fill="none" stroke="var(--person)" stroke-width="3"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
+      <button class="q warm" data-q="br" type="button"><span class="qt">A person decides, AI alongside</span><span class="qs">A person decides with AI alongside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--person)"/><circle cx="80" cy="20" r="9" fill="var(--ai)"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
     </div>
     <p class="status" id="mapstatus" aria-live="polite"></p>
     <div class="scroll">
@@ -185,33 +223,33 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
     <h3>(a) My quadrant</h3>
     <p><b>AI alone, with checks</b> (bottom left).</p>
     <h3>(b) The two questions</h3>
-    <p><b>Work with a right answer.</b> Every email can be checked against a source of truth: the forecast either matches BBC Weather's Singapore page at that time or it doesn't. The tricky case showed this too: with the wrong location ID there was a clear wrong answer (a 404), not a matter of taste. The setup test email showed this. Its subject, "Tonight: Thundery Showers, Minimum Temperature: 28°C (82°F)", matched word for word the BBC feed I fetched separately at 23:00 SGT, so I could mark it right without any judgement call.</p>
-    <p><b>Work that either of them can do alone.</b> I could look up the forecast myself in a minute, and the Zap does it with no human step at all: one trigger, one action, no approval in between. Nothing in the job needs a person and AI working on the same item at once.</p>
+    <p><b>Work with a right answer.</b> Every number in the email has a source of truth: NEA's published reading for that hour. I did not need any judgement to mark the emails right. For three scheduled runs, all 30 numbers matched NEA's record exactly. The labels are also fixed rules, not opinions: "Unhealthy" means PSI 101 to 200 on NEA's scale. Even the tricky case had a right answer: "there is no reading" is a fact, and after the fix the email says exactly that instead of guessing or going silent.</p>
+    <p><b>Work that either of them can do alone.</b> I could look up the PSI and the forecast myself in a minute, and the Zap sent 22 scheduled emails with no person inside any run, with no approval step between the fetch and the email. Nothing in the job needs a person and AI working on the same item at the same time.</p>
     <h3>(c) The person in the loop</h3>
-    <p><b>Where I stay at the gate:</b> not before each email, but after. In my evening check I confirm the Zap is still on, compare each email with Zap history, and spot-check one forecast against bbc.co.uk/weather. <b>What the agent may do alone:</b> read one public feed and email one fixed address, mine. The Gmail "To" field is typed in, never mapped, so it cannot reach anyone else. <b>What would move it:</b> if it emailed classmates or clients, I would want to approve before sending, which moves it to <i>A person leads, AI inside</i>. If it advised on choices with no single right answer (for example "should we hold the outdoor event tomorrow?"), it moves to <i>A person decides, AI alongside</i>, with me making the call.</p>
+    <p><b>Where I stay at the gate:</b> after the run, not before. Once a day I (1) check that the Zap is still on, (2) scan Zap history for anything Errored, because before the fix a missing feed produced <i>no email at all</i>, so my inbox alone could not show a failure, and (3) compare one email with NEA's figure for the same hour. <b>What the agent may do alone:</b> read three public, read-only NEA feeds, work out averages and the official bands, and email one fixed address, mine. <b>What would move it:</b> if it gave advice that depends on the person, such as "cancel the outdoor sports day" or "staff should work from home", the job would have no single right answer and would move to <i>A person decides, AI alongside</i>, with a manager making the call. If it sent haze alerts to other people (staff, parents or clients) who act on them, a wrong number would have a real cost, so I would sign off each alert before it goes out. That moves it to <i>A person leads, AI inside</i>.</p>
     <h3>(d) My group's view</h3>
-    <p>Our group's board (<a href="board.html">board.html</a>) puts the closest task to mine, <i>Stocks: pull daily closing prices</i>, in <b>AI alone, with checks</b>, because it is "a fixed, checkable fact" that a script fetches with a spot check. I agree, and my agent belongs beside it. The group put its agent-style tasks (screening stocks for a watchlist, gathering sources for a literature review, tailoring a CV per job) in <b>Agents run it, a person judges</b>, because there is no single right list. I agree for those too.</p>
-<p>Where I would answer differently is the <b>together or alone</b> question. The group answered it by asking whether a person must be inside each run. My tricky case shows that "alone" still needs a person outside the run: when the feed broke, the agent could not notice, Zap history logged nothing, and only Zapier's own alert email told me. So I keep my agent in "alone", but I'd add that "alone" agents need a named person who checks they are still running, not only that their output is right. I would also split the classmates' agents by the <b>right answer</b> question. A weather or "email matches a search" alert has a right answer. A "morning headlines" digest that chooses which stories matter does not, which would move it towards the right-hand column.</p>
+    <p>Our group's board (<a href="board.html">board.html</a>) puts the task closest to mine, <i>Stocks: pull daily closing prices</i>, in <b>AI alone, with checks</b>, because it is "a fixed, checkable fact" that a script can fetch alone with a spot check. I agree, and my agent belongs right beside it. I also agree with putting the agent-style tasks (screening stocks for a watchlist, gathering sources for a literature review) in <b>Agents run it, a person judges</b>, because there is no single right list.</p>
+    <p>Where I would answer differently is the <b>together or alone</b> question. The group answered it by asking whether a person must be inside each run. My tricky case shows that "alone" still needs a named person <i>outside</i> the run: when the feed had no data, the agent could not notice, sent nothing, and the failure showed only in Zap history. So I keep my agent in "alone", but I would add that every "alone" agent needs someone who checks that it is still running and not failing silently, not only that its answers are right. I would also be stricter on the <b>right answer</b> question. My agent's "Unhealthy" label is a right answer only because NEA fixes the bands. The moment it turns that into advice ("wear a mask today"), the right answer depends on the person (asthma, age, plans), and it moves to the right-hand column.</p>
   </section>
 
   <section id="log">
     <h2>Collaboration log</h2>
     <div class="scroll"><table>
       <tbody>
-        <tr><th scope="row">What I delegated to AI</th><td>I used Claude (in the Claude desktop app, driving my Chrome) to compare Zapier's free options for a Singapore weather agent, find a free weather feed (BBC Weather RSS), click through the Zap set-up, draft this page and the card, create the GitHub repo and deploy it on Vercel. I did the Google sign-in and approved each step myself.</td></tr>
-        <tr><th scope="row">What I checked, and how</th><td>I checked that the Zap has one trigger and one action and uses only free apps (RSS by Zapier, Gmail), with no card added. I made sure the Gmail "To" field is my own personal address, typed in rather than mapped, with CC and BCC empty. I compared the test email against the raw BBC feed. I confirmed the broken-URL case in the editor, in Zap runs and in Zapier's alert email. I checked the page and repo load without signing in.</td></tr>
-        <tr><th scope="row">One AI error I caught</th><td>The AI stamped my tricky-case expectation "23:35 SGT", but it was written at 23:23, before the 23:25 run. I caught it by comparing with the git commit times and corrected it, because a wrong stamp would have made the expectation look as if it came <i>after</i> the run. A second near-miss: the editor kept showing old cached Singapore records after I broke the URL, so the AI's first read was that the trigger still worked. Pressing "Find new records" showed the real 404.</td></tr>
-        <tr><th scope="row">Time and cost</th><td>About 45 minutes on Mon 19 Oct (23:00–23:45 SGT) for the build, tricky case, fix and page. The cost is $0: Zapier free plan (a Pro trial switched on, but I used only free-plan features), Vercel Hobby and GitHub Free, with no card added anywhere.</td></tr>
+        <tr><th scope="row">What I delegated to AI</th><td>I used Claude (Claude Code in the Claude desktop app, with its built-in browser) to build the Zap in Zapier's web editor, write and test the JavaScript code step, add the weather, run the Step 2 checks (all 14 pages of Zap history, and 30 numbers compared with NEA's records), run the tricky case and the fix, export the JSON, and draft and publish this page. I logged in to Zapier myself, chose the PSI idea, the 6-hour cadence and adding the weather, and approved each step, including publishing.</td></tr>
+        <tr><th scope="row">What I checked, and how</th><td>Each version of the code was run against live NEA data before it went into Zapier, and the code in Zapier was compared character by character (by a checksum) with the tested file. The filter was tested with real trigger records (a 2 pm record must stop, a midnight record must pass). The three emails were checked against NEA's historical API, and Zap history was scanned for errors. After the tricky case, the published code was checked to confirm it uses the live PSI request, not the test date. Email addresses are covered in every screenshot, and <code>*.json</code> is in <code>.gitignore</code>, so the Zap-history file stays off GitHub.</td></tr>
+        <tr><th scope="row">One AI error I caught</th><td>The AI's first filter used Zapier's <i>(Text) Is in</i> rule with "0,6,12". The filter test showed the 2 pm record would <b>pass</b>, because "Is in" matches text inside text, and "2" is inside "12". Published like that, the Zap would have emailed at 1, 2, 6 and 12 o'clock, am and pm, about eight emails a day, over Zapier's limit of 5. It was replaced with three "Exactly matches" rules joined by OR and tested again (2 pm blocked). A smaller one: the AI assumed midnight would show as hour "0", but a real record showed "12". That was harmless, because 12 was already allowed.</td></tr>
+        <tr><th scope="row">Time and cost</th><td>About 2 hours in total: build on Wed 14 Oct (about 14:30–15:05 SGT), adding the weather on Tue 20 Oct (00:40–00:50), and the Step 2 checks, tricky case, fix and this page (01:05–02:30). Cash cost $0: Zapier's 14-day Professional trial with no card (the four-step Zap needs paid features, about US$19.99 a month after the trial), Vercel Hobby, GitHub Free and free NEA data, plus my existing Claude plan. Each emailed run uses 2 Zapier tasks.</td></tr>
       </tbody>
     </table></div>
   </section>
 
   <section id="reflection">
     <h2>Reflection</h2>
-    <p>My agent fitted the job well: fetching a checkable forecast from one public feed and emailing it only to me is narrow, rule-bound work that a one-trigger, one-action Zap can do alone. It failed where a quiet agent is weakest: when the feed broke, it neither emailed nor logged a run, so silence looked the same as working, and only Zapier's own alert (and then the Zap turning off) gave it away. Next time I would add a regular "still alive" check, for example a weekly scheduled email that confirms the agent is on, and I would pick a feed that posts one item per update rather than three.</p>
+    <p>My agent fitted the job well: reading official, checkable numbers on a fixed schedule and emailing them only to me is narrow, right-answer work it did alone, with 22 scheduled emails, no errors and 30 of 30 checked numbers matching NEA. It failed where its data source went quiet: when NEA had no PSI reading, the code crashed and no email went out, so silence looked the same as clean air, and it also needed paid Zapier features that the brief asked me to avoid. I would keep the "PSI unavailable" fallback, add a daily "still running" check, and before building, test whether the job fits one trigger and one action on the free plan, rather than finding out after.</p>
   </section>
 
-  <p class="meta">Our group's interactive map board from Week 7 is at <a href="board.html">board.html</a>. This page holds no client data or keys, email addresses are cropped from the screenshots, and the Zap-history JSON stays off GitHub.</p>
+  <p class="meta">Our group's interactive map board from Week 7 is at <a href="board.html">board.html</a>. My earlier one-trigger, one-action attempt is archived at <a href="sg-weather-watch.html">sg-weather-watch.html</a>. This page holds no client data or keys, email addresses are covered in the screenshots, and the Zap-history JSON stays off GitHub.</p>
 </div>
 <script>
 (function () {
