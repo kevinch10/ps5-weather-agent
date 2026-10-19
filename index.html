@@ -100,6 +100,16 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
 
   <section id="tricky">
     <h2>Tricky case &amp; fix</h2>
+    <h3>The case: a broken feed URL</h3>
+    <p>I point the trigger at a BBC location that does not exist (ID <code>0000000</code> instead of Singapore's <code>1880252</code>). This is what would happen if BBC moved or retired the feed. With a wrong ID, BBC answers "404 Not Found" and sends no RSS.</p>
+    <h3>What I expected, written before the run (Mon 19 Oct 2026, 23:35 SGT)</h3>
+    <ul>
+      <li>The trigger fails with a "feed not found" or 404 error, and Zapier sends <b>no email</b>.</li>
+      <li>The real risk is a <b>silent failure</b>. Since my agent normally stays quiet between BBC updates, an empty inbox looks the same whether the Zap is working or broken. I expect Zapier to show the error in Zap history and the editor, but not to tell me straight away.</li>
+    </ul>
+    <h3>What happened</h3>
+    <div class="pending">In progress.</div>
+    <h3>The fix and the rerun</h3>
     <div class="pending">In progress.</div>
   </section>
 
