@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SG Weather Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Mono:wght@500&display=swap">
+<style>
+:root {
+  --bg: #f5f7fa; --panel: #ffffff; --ink: #1e2a4a; --ink-soft: #5a6884; --q-ink: #3a2d68;
+  --rule: #dfe4ec; --accent: #c8364a; --note-bg: #eef2f6;
+  --q-warm: #fbf4fb; --q-warm-line: #dcc2df; --q-cool: #f3f7fa; --q-cool-line: #c4d8e5;
+  --person: #7a55b5; --ai: #2a7fb0; --ok: #258a59; --warn: #bd5f1a; --mark: #f5c542;
+  --font: "Fira Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Fira Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --panel: #1a1f29; --ink: #e6ebf3; --ink-soft: #9aa6bb; --q-ink: #cdbff2; --rule: #2c3442;
+    --accent: #e0566a; --note-bg: #20262f; --q-warm: #241d29; --q-warm-line: #5b4560; --q-cool: #1a2430; --q-cool-line: #3b5670;
+    --person: #9a7bd6; --ai: #3f93c4; --ok: #3aa874; --warn: #d9803d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a1f29; --ink: #e6ebf3; --ink-soft: #9aa6bb; --q-ink: #cdbff2; --rule: #2c3442;
+  --accent: #e0566a; --note-bg: #20262f; --q-warm: #241d29; --q-warm-line: #5b4560; --q-cool: #1a2430; --q-cool-line: #3b5670;
+  --person: #9a7bd6; --ai: #3f93c4; --ok: #3aa874; --warn: #d9803d; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.55; }
+.page { max-width: 920px; margin: 0 auto; padding: 28px 16px 56px; }
+header { border-left: 6px solid var(--accent); padding: 4px 0 4px 16px; margin-bottom: 28px; }
+.badge { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; border-radius: 999px;
+  padding: 4px 14px 4px 10px; font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--mark); }
+h1 { font-size: clamp(28px, 6vw, 40px); margin: 10px 0 4px; line-height: 1.15; }
+.lede { color: var(--ink-soft); margin: 0; max-width: 62ch; }
+nav { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 14px 0 0; font-size: 14px; }
+nav a { color: var(--ink-soft); }
+section { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 22px; margin: 0 0 20px; }
+h2 { font-size: 21px; margin: 0 0 12px; color: var(--q-ink); }
+h3 { font-size: 16px; margin: 18px 0 6px; }
+p, li { max-width: 70ch; }
+a { color: var(--ai); }
+.card { font-family: var(--mono); font-size: 14px; line-height: 1.6; background: var(--note-bg); border-radius: 6px;
+  padding: 14px 16px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.card b { color: var(--q-ink); }
+.meta { font-size: 13.5px; color: var(--ink-soft); }
+.pending { border: 1.5px dashed var(--rule); border-radius: 6px; padding: 12px 14px; color: var(--ink-soft); font-size: 14.5px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+.scroll { overflow-x: auto; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+.step { flex: 1 1 220px; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 14px; }
+.step .k { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+.arrow { align-self: center; color: var(--ink-soft); font-size: 20px; }
+@media (max-width: 560px) { .arrow { display: none; } section { padding: 16px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <span class="badge">Problem Set 5 · My agent</span>
+    <h1>SG Weather Watch</h1>
+    <p class="lede">A Zapier agent with one trigger and one action. When BBC Weather posts a new Singapore forecast, it emails the forecast to me.</p>
+    <nav>
+      <a href="#card">Agent card</a><a href="#zap">The Zap</a><a href="#runs">Runs</a><a href="#tricky">Tricky case &amp; fix</a>
+      <a href="#map">Map</a><a href="#q1">Q1</a><a href="#log">Collaboration log</a><a href="#reflection">Reflection</a>
+    </nav>
+  </header>
+
+  <section id="card">
+    <h2>My agent card</h2>
+    <pre class="card"><b>My agent card | SG Weather Watch | finished Mon 19 Oct 2026, 23:15 SGT</b>
+<b>1. The job:</b> Emails the latest Singapore weather forecast (sky, min/max temperature, humidity, wind, UV) to a student who commutes to SMU (me), each time BBC Weather updates it, so I know whether to carry an umbrella.
+<b>2. The trigger:</b> RSS by Zapier "New Item in Feed" finds a new item in BBC Weather's 3-day Singapore feed (checked every 15 minutes on the free plan).
+<b>3. The tools:</b> RSS by Zapier: New Item in Feed (reads the feed only). Gmail: Send Email (to me only). No other apps or actions.
+<b>4. It must never:</b> email anyone but me. The Gmail "To" field is typed in as my own address, never mapped from the feed, and CC and BCC are left empty.
+<b>5. Where a person checks:</b> I (the student) read each email when it arrives and check it against Zap history and the BBC Weather page every evening, until I turn the Zap off after class on Wed 21 Oct.</pre>
+    <p class="meta">Written before the Zap's first run. I set the 6-hour cadence of my original idea aside: Zapier's free Schedule trigger has no "every 6 hours" option, and fetching weather on a schedule would need a third step.</p>
+  </section>
+
+  <section id="zap">
+    <h2>The Zap</h2>
+    <div class="flow">
+      <div class="step"><div class="k">Trigger</div><b>RSS by Zapier</b> · New Item in Feed<br><span class="meta">BBC Weather 3-day forecast, Singapore (location 1880252)</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="step"><div class="k">Action</div><b>Gmail</b> · Send Email<br><span class="meta">To: my own personal address · Subject: the forecast title · Body: the forecast description + link</span></div>
+    </div>
+    <p class="meta">Free plan, free apps, no card. A personal Google account, not my SMU one.</p>
+  </section>
+
+  <section id="runs">
+    <h2>Runs, checked against Zap history</h2>
+    <div class="pending">In progress: screenshots of at least three runs, each checked against Zap history.</div>
+  </section>
+
+  <section id="tricky">
+    <h2>Tricky case &amp; fix</h2>
+    <div class="pending">In progress.</div>
+  </section>
+
+  <section id="map">
+    <h2>Where it sits on our map</h2>
+    <div class="pending">In progress.</div>
+  </section>
+
+  <section id="q1"><h2>Q1</h2><div class="pending">In progress.</div></section>
+  <section id="log"><h2>Collaboration log</h2><div class="pending">In progress.</div></section>
+  <section id="reflection"><h2>Reflection</h2><div class="pending">In progress.</div></section>
+
+  <p class="meta">Our group's interactive map board from Week 7 is at <a href="board.html">board.html</a>. This page holds no client data or keys, email addresses are cropped from the screenshots, and the Zap-history JSON stays off GitHub.</p>
+</div>
+</body>
+</html>

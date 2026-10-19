@@ -1,0 +1,4 @@
+.vercel
+*.json
+.DS_Store
+screens-raw/

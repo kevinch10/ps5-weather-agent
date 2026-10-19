@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI Work Quadrants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Mono:wght@500&display=swap">
+<style>
+/* Layout: a framed board. Axis labels sit on a header row and a left rail; four bordered quadrants fill a 2x2 grid; a commentary bar and a tray of task chips run underneath. */
+:root {
+  --bg: #f5f7fa;
+  --panel: #ffffff;
+  --ink: #1e2a4a;
+  --ink-soft: #5a6884;
+  --q-ink: #3a2d68;           /* quadrant titles, a deep indigo */
+  --rule: #dfe4ec;
+  --accent: #c8364a;          /* the red frame rail and badge */
+  --q-warm: #fbf4fb;          /* "together" diagonal */
+  --q-warm-line: #dcc2df;
+  --q-cool: #f3f7fa;          /* "alone/agents" diagonal */
+  --q-cool-line: #c4d8e5;
+  --note-bg: #eef2f6;
+  --drop: #e3ecf7;
+  --chip-fg: #ffffff;
+  --c-navy: #1e2f55;
+  --c-blue: #1f6d94;
+  --c-sky: #4a8db8;
+  --c-gold: #a17b1d;
+  --c-red: #c4434f;
+  --c-green: #258a59;
+  --c-purple: #7a55b5;
+  --c-slate: #556274;
+  --c-teal: #13777a;
+  --c-orange: #bd5f1a;
+  --c-pink: #b2427c;
+  --font: "Fira Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Fira Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --panel: #1a1f29; --ink: #e6ebf3; --q-ink: #cdbff2; --ink-soft: #9aa6bb; --rule: #2c3442;
+    --accent: #e0566a; --q-warm: #241d29; --q-warm-line: #5b4560; --q-cool: #1a2430; --q-cool-line: #3b5670;
+    --note-bg: #20262f; --drop: #23324a; --chip-fg: #ffffff;
+    --c-navy: #3a5a88; --c-blue: #2a7fb0; --c-sky: #3f93c4; --c-gold: #a8801c; --c-red: #c84455;
+    --c-green: #23885b; --c-purple: #8160bd; --c-slate: #637084; --c-teal: #1b8a8d; --c-orange: #c56a24; --c-pink: #bd4f88;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a1f29; --ink: #e6ebf3; --q-ink: #cdbff2; --ink-soft: #9aa6bb; --rule: #2c3442;
+  --accent: #e0566a; --q-warm: #241d29; --q-warm-line: #5b4560; --q-cool: #1a2430; --q-cool-line: #3b5670;
+  --note-bg: #20262f; --drop: #23324a; --chip-fg: #ffffff;
+  --c-navy: #3a5a88; --c-blue: #2a7fb0; --c-sky: #3f93c4; --c-gold: #a8801c; --c-red: #c84455;
+  --c-green: #23885b; --c-purple: #8160bd; --c-slate: #637084; --c-teal: #1b8a8d; --c-orange: #c56a24; --c-pink: #bd4f88;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; }
+.page { max-width: 1440px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 40px; }
+
+.board {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left: 6px solid var(--accent);
+  border-radius: 6px;
+  padding: 18px 22px 20px;
+  display: grid;
+  gap: 16px;
+}
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: var(--chip-fg);
+  border-radius: 999px; padding: 6px 16px 6px 12px;
+  font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.badge::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #f5c542; flex: none; }
+.count { font-family: var(--mono); font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.status { font-size: 12.5px; color: var(--ink-soft); }
+
+/* Grid of axis labels + quadrants */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(130px, 210px) 1fr 1fr;
+  gap: 16px 18px;
+  align-items: stretch;
+}
+.col-head { text-align: center; font-weight: 600; font-size: 22px; letter-spacing: .01em; text-wrap: balance; padding-bottom: 2px; }
+.row-head { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 500; font-size: 20px; line-height: 1.4; text-wrap: balance; padding: 0 8px; }
+
+.quad {
+  border: 1.5px solid var(--q-cool-line);
+  background: var(--q-cool);
+  border-radius: 10px;
+  padding: 16px 22px 22px;
+  min-height: 190px;
+  min-width: 0;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: background-color .15s, border-color .15s;
+}
+.quad[data-q="tl"], .quad[data-q="br"] { background: var(--q-warm); border-color: var(--q-warm-line); }
+.quad.drop-over { background: var(--drop); border-style: dashed; }
+.quad-head { display: flex; align-items: baseline; gap: 10px; justify-content: space-between; }
+.quad-title { font-weight: 600; font-size: 20px; margin: 0; min-width: 0; color: var(--q-ink); letter-spacing: .01em; }
+.axis-tags { display: none; gap: 6px; flex-wrap: wrap; }
+.axis-tags span { font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-soft); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 6px; background: var(--panel); }
+
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 205px), 1fr)); gap: 22px 18px; padding-top: 4px; list-style: none; margin: 0; padding: 0; }
+.item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 17.5px; cursor: pointer; border-radius: 6px; padding: 4px 6px; margin: -4px -6px;
+  min-width: 0; background: none; border: 0; color: inherit; font-family: inherit; text-align: left;
+}
+.item:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.item.selected { background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.item .dot { width: 22px; height: 22px; border-radius: 50%; flex: none; }
+.item .txt { min-width: 0; overflow-wrap: break-word; }
+.item .fn { font-weight: 400; }
+.item .sep { color: var(--ink-soft); margin: 0 5px; }
+
+.empty-q {
+  flex: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+  color: var(--ink-soft); font-size: 13.5px; border: 1.5px dashed var(--rule); border-radius: 6px; padding: 14px;
+}
+
+.add-q {
+  font: inherit; font-size: 13px; font-weight: 500; color: var(--ink-soft);
+  background: none; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; cursor: pointer; flex: none;
+}
+.add-q:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+/* Commentary bar */
+.note {
+  background: var(--note-bg); border-left: 3px solid var(--ink); border-radius: 0 4px 4px 0;
+  padding: 12px 18px; display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;
+}
+.note-body { min-width: 0; flex: 1 1 320px; }
+.note-kicker { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 2px; }
+.note-text { font-size: 15.5px; overflow-wrap: anywhere; }
+.note-text.muted { color: var(--ink-soft); font-style: italic; }
+.note-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Tray */
+.tray { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-height: 40px; border-radius: 6px; padding: 4px; margin: -4px; }
+.tray.drop-over { background: var(--drop); }
+.chip {
+  font: inherit; font-size: 15px; font-weight: 500; color: var(--chip-fg);
+  border: 2px solid transparent; border-radius: 4px; padding: 3px 10px; cursor: pointer;
+  max-width: 100%; overflow-wrap: anywhere; text-align: left;
+}
+.chip.placed { box-shadow: inset 0 -3px 0 color-mix(in srgb, #000 22%, transparent); }
+.chip:hover { filter: brightness(1.08); }
+.btn {
+  font: inherit; font-size: 15px; font-weight: 600; border-radius: 4px; padding: 3px 12px; cursor: pointer;
+  border: 2px solid var(--ink); background: var(--ink); color: var(--panel);
+}
+.btn.ghost { background: var(--panel); color: var(--ink); }
+.btn.small { font-size: 13.5px; padding: 2px 10px; }
+.btn.danger { border-color: var(--c-red); background: var(--c-red); color: var(--chip-fg); }
+.btn.warn { border-color: var(--c-red); background: var(--panel); color: var(--c-red); }
+.btn.warn.armed { background: var(--c-red); color: var(--chip-fg); }
+.btn.add { border-style: dashed; background: transparent; color: var(--ink); }
+
+.hint { background: var(--note-bg); border-left: 3px solid var(--c-blue); padding: 8px 14px; font-style: italic; color: var(--ink-soft); font-size: 14px; border-radius: 0 4px 4px 0; }
+.empty-tray { color: var(--ink-soft); font-size: 14px; }
+
+[contenteditable="true"], [contenteditable="plaintext-only"] { outline: none; border-radius: 3px; cursor: text; }
+[contenteditable="true"]:hover, [contenteditable="plaintext-only"]:hover { box-shadow: 0 0 0 1px var(--rule); }
+[contenteditable="true"]:focus, [contenteditable="plaintext-only"]:focus { box-shadow: 0 0 0 2px var(--c-blue); background: var(--panel); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--c-blue); outline-offset: 2px; }
+
+/* Editor modal */
+.scrim { position: fixed; inset: 0; background: color-mix(in srgb, #000 45%, transparent); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+.editor { background: var(--panel); color: var(--ink); border-radius: 8px; border-top: 5px solid var(--accent); width: min(520px, 100%); max-height: 100%; overflow: auto; padding: 18px 20px 20px; display: grid; gap: 14px; }
+.editor h2 { margin: 0; font-size: 19px; }
+.field { display: grid; gap: 5px; }
+.field label, .field .lbl { font-size: 12.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-soft); }
+.field input[type=text], .field select, .field textarea {
+  font: inherit; font-size: 15px; color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 5px; padding: 7px 10px; width: 100%;
+}
+.field textarea { min-height: 72px; resize: vertical; }
+.two { display: grid; grid-template-columns: 1fr 1.6fr; gap: 12px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatches label { position: relative; cursor: pointer; }
+.swatches input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.swatches span { display: block; width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--panel); box-shadow: 0 0 0 1px var(--rule); }
+.swatches input:checked + span { box-shadow: 0 0 0 2px var(--ink); }
+.swatches input:focus-visible + span { outline: 2px solid var(--c-blue); outline-offset: 2px; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14.5px; }
+.editor-actions { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
+.editor-actions .right { display: flex; gap: 8px; }
+.err { color: var(--c-red); font-size: 13.5px; }
+
+@media (max-width: 760px) {
+  .board { padding: 14px 14px 16px; border-left-width: 4px; }
+  .grid { grid-template-columns: 1fr; }
+  .col-head, .row-head, .corner { display: none; }
+  .axis-tags { display: flex; }
+  .quad-head { flex-wrap: wrap; }
+  .items { grid-template-columns: 1fr; }
+  .two { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<div class="page">
+  <section class="board" id="board">
+    <div class="topbar">
+      <span class="badge"><span data-label="title" id="lbl-title"></span></span>
+      <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap">
+        <span class="status" id="status">Connecting…</span>
+        <span class="count" id="count">0 of 0 placed</span>
+      </div>
+    </div>
+
+    <div class="grid" id="grid">
+      <div class="corner"></div>
+      <div class="col-head" data-label="colLeft"></div>
+      <div class="col-head" data-label="colRight"></div>
+
+      <div class="row-head" data-label="rowTop"></div>
+      <div class="quad" data-q="tl"></div>
+      <div class="quad" data-q="tr"></div>
+
+      <div class="row-head" data-label="rowBottom"></div>
+      <div class="quad" data-q="bl"></div>
+      <div class="quad" data-q="br"></div>
+    </div>
+
+    <div class="note" id="note"></div>
+    <div class="tray" id="tray" aria-label="Task cards"></div>
+    <div class="hint" id="hint"></div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <form class="editor" id="editor" novalidate>
+    <h2 id="ed-title">Add a task</h2>
+    <div class="two">
+      <div class="field">
+        <label for="f-func">Function</label>
+        <input type="text" id="f-func" list="func-list" placeholder="e.g. Bank" maxlength="40" autocomplete="off">
+        <datalist id="func-list"></datalist>
+      </div>
+      <div class="field">
+        <label for="f-task">Task</label>
+        <input type="text" id="f-task" placeholder="e.g. Check a loan file" maxlength="80" autocomplete="off">
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-quad">Quadrant</label>
+      <select id="f-quad"></select>
+    </div>
+    <div class="field">
+      <label for="f-reason">Why it goes here</label>
+      <textarea id="f-reason" maxlength="600" placeholder="Shown below the board when someone clicks this task."></textarea>
+    </div>
+    <div class="field">
+      <span class="lbl">Colour</span>
+      <div class="swatches" id="swatches"></div>
+    </div>
+    <label class="check"><input type="checkbox" id="f-placed"> Show on the board now</label>
+    <div class="err" id="ed-err" hidden></div>
+    <div class="editor-actions">
+      <button type="button" class="btn ghost" id="ed-delete">Delete task</button>
+      <div class="right">
+        <button type="button" class="btn ghost" id="ed-cancel">Cancel</button>
+        <button type="submit" class="btn" id="ed-save">Save</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+(() => {
+  const QUADS = ["tl", "tr", "bl", "br"];
+  const COLORS = ["navy", "blue", "sky", "gold", "red", "green", "purple", "teal", "orange", "pink", "slate"];
+  const DEFAULT_LABELS = {
+    title: "AI work quadrants",
+    colLeft: "Work with a right answer",
+    colRight: "Work with no single right answer",
+    rowTop: "Work that people and AI must do together",
+    rowBottom: "Work that either of them can do alone",
+    tl: "A person leads, AI inside",
+    tr: "Agents run it, a person judges",
+    bl: "AI alone, with checks",
+    br: "A person decides, AI alongside",
+    note: "Add tasks with the button below, then click a card to place it on the board. Click a placed task to read why it sits there.",
+  };
+  const AXES = { tl: ["colLeft", "rowTop"], tr: ["colRight", "rowTop"], bl: ["colLeft", "rowBottom"], br: ["colRight", "rowBottom"] };
+  const LOCAL_KEY = "quadrant-board-v1";
+  // Starting examples for the browser-only version (the shared board keeps its own copy).
+  const SEED = [
+    ["Bank", "Check a loan file", "tl", "navy"],
+    ["Government", "Approve a benefit claim", "tl", "blue"],
+    ["Product", "Write release notes", "tl", "gold"],
+    ["Marketing", "Translate a product page", "tl", "red"],
+    ["Payments", "Match payments to invoices", "bl", "green"],
+    ["Insurer", "Check a claim form", "bl", "green"],
+    ["Tech", "Reset a password by policy", "bl", "sky"],
+    ["Government", "Check a permit form", "bl", "blue"],
+    ["Marketing", "Test ad versions", "tr", "red"],
+    ["Consulting", "Size a market", "tr", "purple"],
+    ["Product", "Sort user comments", "tr", "gold"],
+    ["Insurer", "Settle a disputed claim", "tr", "green"],
+    ["Consulting", "Advise on a merger", "br", "purple"],
+    ["Bank", "Plan a negotiation", "br", "navy"],
+    ["Asset manager", "Write investor letter", "br", "green"],
+    ["Government", "Draft a policy", "br", "blue"],
+    // A person leads, AI inside
+    ["Stocks", "Work out capital gains tax", "tl", "teal", "There is one correct figure, but it rests on your own trade records and tax situation. You lead, and AI does the arithmetic and flags missing lots."],
+    ["Student", "Solve a finance problem set", "tl", "orange", "The answers are right or wrong, and the point is that you learn the method. You work the problem and use AI to check steps, not to hand in its answers."],
+    ["CV", "Check dates and job titles", "tl", "pink", "Only you know the true facts. AI can spot gaps, overlaps and inconsistent formatting, but you confirm every line."],
+    // Agents run it, a person judges
+    ["Stocks", "Screen stocks for a watchlist", "tr", "teal", "There is no single right list. An agent can run many screens across thousands of tickers, and you judge which names deserve a closer look."],
+    ["Student", "Gather sources for a literature review", "tr", "orange", "Many reading lists could work. Agents can search and summarise widely, and you judge which sources are credible and relevant."],
+    ["CV", "Tailor a CV to each job posting", "tr", "pink", "Each posting wants a different emphasis. An agent drafts a version per job, and you judge whether each one still sounds like you and stays true."],
+    // AI alone, with checks
+    ["Stocks", "Pull daily closing prices", "bl", "teal", "A fixed, checkable fact. AI or a script can fetch it alone, with a spot check against the exchange or a second data source."],
+    ["Student", "Format citations in APA", "bl", "orange", "The style guide has right answers. AI can format the whole list, and a quick check catches any wrong author or year."],
+    ["CV", "Fix spelling and grammar", "bl", "pink", "Errors are clear-cut. AI can correct them alone, and you skim the result before sending."],
+    // A person decides, AI alongside
+    ["Stocks", "Decide whether to sell a holding", "br", "teal", "It depends on your goals, risk and timing, and you carry the outcome. AI can lay out scenarios and counterarguments, but the call is yours."],
+    ["Student", "Choose electives for next term", "br", "orange", "It depends on your interests and career plans. AI can compare workloads and prerequisites, and you make the choice."],
+    ["CV", "Choose which experience to highlight", "br", "pink", "This is your story to tell. AI can suggest angles for a role, and you decide what represents you best."],
+  ].map(([func, task, quad, color, reason = ""], i) => ({ id: "ex" + String(i + 1).padStart(2, "0"), func, task, quad, color, reason, placed: true, created: i + 1 }));
+
+  const state = {
+    items: [],              // {id, func, task, quad, color, reason, placed, created}
+    labels: { ...DEFAULT_LABELS },
+    selected: null,
+    canWrite: true,
+    mode: "loading",        // loading | shared | local
+    localPlaced: {},        // per-viewer placement when the viewer cannot write
+    editing: null,          // id or "new"
+  };
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const h = (tag, props = {}, ...kids) => {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "style") el.style.cssText = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else if (k === "text") el.textContent = v;
+      else el.setAttribute(k, v === true ? "" : v);
+    }
+    for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid);
+    return el;
+  };
+  const colorVar = c => `var(--c-${COLORS.includes(c) ? c : "slate"})`;
+  const isPlaced = it => (it.id in state.localPlaced ? state.localPlaced[it.id] : !!it.placed);
+  const labelText = k => (state.labels[k] ?? DEFAULT_LABELS[k] ?? "");
+
+  /* ---------- Storage: shared db when available, this browser otherwise ---------- */
+  let store = null;
+
+  function localStore() {
+    let data = { items: [], labels: {}, seeded: [] };
+    try { const raw = localStorage.getItem(LOCAL_KEY); if (raw) data = JSON.parse(raw) || data; } catch (e) {}
+    const save = () => { try { localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); } catch (e) {} };
+    // Saves from before this list existed already held the first 16 examples.
+    if (!Array.isArray(data.seeded)) data.seeded = SEED.slice(0, 16).map(it => it.id);
+    const fresh = SEED.filter(it => !data.seeded.includes(it.id));
+    if (fresh.length) {
+      data.items.push(...fresh.map(it => ({ ...it })));
+      data.seeded.push(...fresh.map(it => it.id));
+      save();
+    }
+    const emit = () => { state.items = data.items.slice(); state.labels = { ...DEFAULT_LABELS, ...data.labels }; render(); };
+    return {
+      start() { emit(); },
+      async add(item) { data.items.push({ ...item, id: "l" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }); save(); emit(); },
+      async update(id, patch) { const it = data.items.find(i => i.id === id); if (it) Object.assign(it, patch); save(); emit(); },
+      async remove(id) { data.items = data.items.filter(i => i.id !== id); save(); emit(); },
+      async setLabel(k, text) { data.labels[k] = text; save(); emit(); },
+    };
+  }
+
+  function sharedStore(db) {
+    const items = db.collection("items");
+    const labels = db.collection("labels");
+    return {
+      start() {
+        items.orderBy("created").onSnapshot(snap => {
+          state.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          render();
+        }, err => setStatus("Live updates stopped. Reload to reconnect."));
+        labels.onSnapshot(snap => {
+          const next = { ...DEFAULT_LABELS };
+          for (const d of snap.docs) { const t = d.data()?.text; if (typeof t === "string" && t.trim()) next[d.id] = t; }
+          state.labels = next;
+          renderLabels();
+          renderNote();
+        }, () => {});
+      },
+      add: item => items.add(item),
+      update: (id, patch) => items.doc(id).update(patch),
+      remove: id => items.doc(id).delete(),
+      setLabel: (k, text) => labels.doc(k).set({ text }),
+    };
+  }
+
+  function setStatus(t) { $("#status").textContent = t; }
+
+  async function write(fn, failMsg) {
+    try { await fn(); }
+    catch (e) {
+      const code = e && e.code;
+      setStatus(code === "quota_exceeded" ? "The board is full. Delete some tasks to add more." : failMsg || "That change didn't save. Try again.");
+    }
+  }
+
+  // A button that needs a second click within a few seconds before it acts.
+  function confirmButton(label, armedLabel, extraClass, action) {
+    const b = h("button", { type: "button", class: "btn warn " + extraClass, text: label });
+    let timer;
+    b.addEventListener("click", () => {
+      if (!b.classList.contains("armed")) {
+        b.classList.add("armed"); b.textContent = armedLabel;
+        timer = setTimeout(() => { b.classList.remove("armed"); b.textContent = label; }, 4000);
+        return;
+      }
+      clearTimeout(timer);
+      action();
+    });
+    return b;
+  }
+
+  /* ---------- Rendering ---------- */
+  function renderLabels() {
+    document.querySelectorAll("[data-label]").forEach(el => {
+      if (el === document.activeElement) return;
+      el.textContent = labelText(el.dataset.label);
+    });
+    document.querySelectorAll(".axis-tags").forEach(el => {
+      const q = el.dataset.q;
+      el.replaceChildren(...AXES[q].map(k => h("span", { text: labelText(k) })));
+    });
+  }
+
+  function renderQuads() {
+    for (const q of QUADS) {
+      const box = $(`.quad[data-q="${q}"]`);
+      const placed = state.items.filter(it => it.quad === q && isPlaced(it));
+      if (!box.dataset.built) {
+        box.dataset.built = "1";
+        box.append(
+          h("div", { class: "quad-head" },
+            h("h3", { class: "quad-title", "data-label": q }),
+            h("button", { class: "add-q", type: "button", "data-add": q, "aria-label": "Add a task to this quadrant", text: "+ Add" })),
+          h("div", { class: "axis-tags", "data-q": q }),
+          h("div", { class: "q-body" })
+        );
+        wireDrop(box, { quad: q, placed: true });
+      }
+      box.querySelector(".add-q").hidden = !state.canWrite;
+      const body = box.querySelector(".q-body");
+      if (!placed.length) {
+        body.replaceChildren(h("div", { class: "empty-q", text: state.canWrite ? "No tasks here yet. Drag a card in, or use + Add." : "No tasks here yet." }));
+        body.style.display = "flex"; body.style.flex = "1";
+      } else {
+        body.style.display = ""; body.style.flex = "";
+        body.replaceChildren(h("ul", { class: "items" }, placed.map(it =>
+          h("li", {},
+            h("button", {
+              type: "button", class: "item" + (state.selected === it.id ? " selected" : ""), draggable: "true",
+              "data-id": it.id, onclick: () => select(it.id), ondragstart: e => dragStart(e, it.id),
+            },
+              h("span", { class: "dot", style: `background:${colorVar(it.color)}` }),
+              h("span", { class: "txt" },
+                it.func ? h("span", { class: "fn", text: it.func }) : null,
+                it.func ? h("span", { class: "sep", text: "·" }) : null,
+                h("span", { text: it.task || "Untitled task" })))))));
+      }
+    }
+  }
+
+  function renderNote() {
+    const note = $("#note");
+    if (document.activeElement?.dataset?.label === "note") return;
+    const it = state.items.find(i => i.id === state.selected);
+    if (!it) {
+      state.selected = null;
+      const body = h("div", { class: "note-body" },
+        h("div", { class: "note-text", "data-label": "note" }));
+      note.replaceChildren(body);
+      const el = body.querySelector("[data-label]");
+      el.textContent = labelText("note");
+      makeEditable(el);
+      return;
+    }
+    const placed = isPlaced(it);
+    note.replaceChildren(
+      h("div", { class: "note-body" },
+        h("div", { class: "note-kicker", text: `${it.func ? it.func + " · " : ""}${it.task || "Untitled task"} — ${labelText(it.quad)}` }),
+        it.reason
+          ? h("div", { class: "note-text", text: it.reason })
+          : h("div", { class: "note-text muted", text: state.canWrite ? "No reason written yet. Use Edit to add one." : "No reason written yet." })),
+      h("div", { class: "note-actions" },
+        state.canWrite ? h("button", { class: "btn small", type: "button", text: "Edit", onclick: () => openEditor(it.id) }) : null,
+        state.canWrite ? confirmButton("Delete", "Click again to delete", "small", () => deleteTask(it.id)) : null,
+        h("button", { class: "btn small ghost", type: "button", text: placed ? "Take off board" : "Place on board", onclick: () => setPlaced(it, !placed) }),
+        h("button", { class: "btn small ghost", type: "button", text: "Close", onclick: () => select(null) })));
+  }
+
+  function renderTray() {
+    const tray = $("#tray");
+    const kids = state.items.map(it =>
+      h("button", {
+        type: "button", class: "chip" + (isPlaced(it) ? " placed" : ""), draggable: "true",
+        style: `background:${colorVar(it.color)}`,
+        title: isPlaced(it) ? "On the board. Click to read why." : "Click to place on the board",
+        onclick: () => { if (!isPlaced(it)) setPlaced(it, true); select(it.id); },
+        ondragstart: e => dragStart(e, it.id),
+        text: `${it.func ? it.func + " · " : ""}${it.task || "Untitled task"}`,
+      }));
+    if (!state.items.length) kids.push(h("span", { class: "empty-tray", text: state.canWrite ? "No tasks yet. Add your first example:" : "No tasks have been added yet." }));
+    if (state.canWrite) kids.push(h("button", { type: "button", class: "btn add", text: "+ Add task", onclick: () => openEditor("new") }));
+    if (state.items.length) {
+      kids.push(h("button", { type: "button", class: "btn", text: "Show all", onclick: () => placeAll(true) }));
+      kids.push(h("button", { type: "button", class: "btn ghost", text: "Clear", onclick: () => placeAll(false) }));
+      if (state.canWrite) kids.push(confirmButton("Delete all", `Click again to delete all ${state.items.length}`, "", deleteAll));
+    }
+    tray.replaceChildren(...kids);
+  }
+
+  function render() {
+    renderQuads();
+    renderLabels();
+    renderNote();
+    renderTray();
+    const n = state.items.length, p = state.items.filter(isPlaced).length;
+    $("#count").textContent = `${p} of ${n} placed`;
+    $("#hint").textContent = state.canWrite
+      ? "▸ Click any heading to rename it. Click a card to place it, drag tasks between quadrants, or click a placed task to edit or delete it. Delete all empties the board."
+      : "▸ Click a card to place it, or click a placed task to read why it sits there. Only editors can add or change tasks.";
+    document.querySelectorAll("[data-label]").forEach(makeEditable);
+  }
+
+  /* ---------- Editable headings ---------- */
+  function makeEditable(el) {
+    if (!state.canWrite) { el.removeAttribute("contenteditable"); return; }
+    if (el.dataset.editable) return;
+    el.dataset.editable = "1";
+    el.setAttribute("contenteditable", "true");
+    el.setAttribute("spellcheck", "false");
+    el.setAttribute("role", "textbox");
+    el.setAttribute("aria-label", "Edit heading");
+    el.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !(el.dataset.label === "note" && e.shiftKey)) { e.preventDefault(); el.blur(); }
+      if (e.key === "Escape") { el.textContent = labelText(el.dataset.label); el.blur(); }
+    });
+    el.addEventListener("paste", e => {
+      e.preventDefault();
+      const t = (e.clipboardData || window.clipboardData).getData("text/plain").replace(/\s+/g, " ");
+      document.execCommand("insertText", false, t);
+    });
+    el.addEventListener("blur", () => {
+      const k = el.dataset.label;
+      const text = el.textContent.replace(/\s+/g, " ").trim().slice(0, 300);
+      if (!text) { el.textContent = labelText(k); return; }
+      if (text === labelText(k)) return;
+      state.labels[k] = text;
+      renderLabels();
+      write(() => store.setLabel(k, text), "Heading didn't save. Try again.");
+    });
+  }
+
+  /* ---------- Actions ---------- */
+  function select(id) { state.selected = id; renderQuads(); renderNote(); }
+
+  function setPlaced(it, val) {
+    if (!state.canWrite) { state.localPlaced[it.id] = val; render(); return; }
+    write(() => store.update(it.id, { placed: val }));
+  }
+
+  async function placeAll(val) {
+    if (!state.canWrite) { for (const it of state.items) state.localPlaced[it.id] = val; render(); return; }
+    if (!val) state.selected = null;
+    for (const it of state.items) if (!!it.placed !== val) await write(() => store.update(it.id, { placed: val }));
+  }
+
+  async function deleteTask(id) {
+    if (state.selected === id) state.selected = null;
+    await write(() => store.remove(id), "Couldn't delete that task. Try again.");
+  }
+
+  async function deleteAll() {
+    state.selected = null;
+    for (const it of state.items.slice()) await write(() => store.remove(it.id), "Some tasks didn't delete. Try again.");
+  }
+
+  /* ---------- Drag and drop ---------- */
+  function dragStart(e, id) { e.dataTransfer.setData("text/plain", id); e.dataTransfer.effectAllowed = "move"; }
+  function wireDrop(el, target) {
+    el.addEventListener("dragover", e => { e.preventDefault(); el.classList.add("drop-over"); });
+    el.addEventListener("dragleave", e => { if (!el.contains(e.relatedTarget)) el.classList.remove("drop-over"); });
+    el.addEventListener("drop", e => {
+      e.preventDefault(); el.classList.remove("drop-over");
+      const it = state.items.find(i => i.id === e.dataTransfer.getData("text/plain"));
+      if (!it) return;
+      if (!state.canWrite) {
+        if (target.quad && target.quad !== it.quad) { setStatus("Only editors can move tasks between quadrants."); return; }
+        state.localPlaced[it.id] = target.placed; render(); return;
+      }
+      const patch = { placed: target.placed };
+      if (target.quad) patch.quad = target.quad;
+      write(() => store.update(it.id, patch));
+      if (target.placed) state.selected = it.id;
+    });
+  }
+
+  /* ---------- Editor ---------- */
+  const ed = {
+    scrim: $("#scrim"), form: $("#editor"), func: $("#f-func"), task: $("#f-task"), quad: $("#f-quad"),
+    reason: $("#f-reason"), placed: $("#f-placed"), err: $("#ed-err"), del: $("#ed-delete"),
+  };
+  $("#swatches").replaceChildren(...COLORS.map(c =>
+    h("label", { title: c },
+      h("input", { type: "radio", name: "f-color", id: "f-color-" + c, value: c, "aria-label": c }),
+      h("span", { style: `background:${colorVar(c)}` }))));
+
+  function colorForFunc(func) {
+    const match = state.items.find(i => i.func && func && i.func.toLowerCase() === func.toLowerCase());
+    if (match) return match.color;
+    const used = new Set(state.items.map(i => i.color));
+    return COLORS.find(c => !used.has(c)) || COLORS[state.items.length % COLORS.length];
+  }
+  let colorTouched = false;
+
+  function openEditor(id, quad) {
+    state.editing = id;
+    const it = id === "new" ? null : state.items.find(i => i.id === id);
+    $("#ed-title").textContent = it ? "Edit task" : "Add a task";
+    ed.quad.replaceChildren(...QUADS.map(q => h("option", { value: q, text: labelText(q) })));
+    ed.func.value = it?.func || "";
+    ed.task.value = it?.task || "";
+    ed.quad.value = it?.quad || quad || "tl";
+    ed.reason.value = it?.reason || "";
+    ed.placed.checked = it ? !!it.placed : !!quad;
+    const color = it?.color || colorForFunc("");
+    (document.getElementById("f-color-" + color) || document.getElementById("f-color-navy")).checked = true;
+    colorTouched = !!it;
+    ed.err.hidden = true;
+    ed.del.hidden = !it;
+    ed.del.textContent = "Delete task"; ed.del.className = "btn ghost"; delete ed.del.dataset.armed;
+    $("#func-list").replaceChildren(...[...new Set(state.items.map(i => i.func).filter(Boolean))].map(f => h("option", { value: f })));
+    ed.scrim.hidden = false;
+    (it ? ed.task : ed.func).focus();
+  }
+  function closeEditor() { ed.scrim.hidden = true; state.editing = null; }
+
+  ed.func.addEventListener("input", () => {
+    if (colorTouched) return;
+    const c = colorForFunc(ed.func.value.trim());
+    const r = document.getElementById("f-color-" + c); if (r) r.checked = true;
+  });
+  $("#swatches").addEventListener("change", () => { colorTouched = true; });
+  $("#ed-cancel").addEventListener("click", closeEditor);
+  ed.scrim.addEventListener("mousedown", e => { if (e.target === ed.scrim) closeEditor(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !ed.scrim.hidden) closeEditor(); });
+
+  ed.del.addEventListener("click", async () => {
+    if (!ed.del.dataset.armed) { ed.del.dataset.armed = "1"; ed.del.textContent = "Click again to delete"; ed.del.className = "btn danger"; return; }
+    const id = state.editing;
+    closeEditor();
+    await deleteTask(id);
+  });
+
+  ed.form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const task = ed.task.value.trim();
+    if (!task) { ed.err.textContent = "Give the task a short name, like “Check a loan file”."; ed.err.hidden = false; ed.task.focus(); return; }
+    const data = {
+      func: ed.func.value.trim(),
+      task,
+      quad: ed.quad.value,
+      reason: ed.reason.value.trim(),
+      placed: ed.placed.checked,
+      color: (document.querySelector('input[name="f-color"]:checked') || {}).value || "navy",
+    };
+    const id = state.editing;
+    closeEditor();
+    if (id === "new") await write(() => store.add({ ...data, created: Date.now() }), "Couldn't add that task. Try again.");
+    else { await write(() => store.update(id, data)); state.selected = id; renderNote(); }
+  });
+
+  document.getElementById("grid").addEventListener("click", e => {
+    const b = e.target.closest("[data-add]");
+    if (b) openEditor("new", b.dataset.add);
+  });
+  wireDrop($("#tray"), { placed: false });
+
+  /* ---------- Boot ---------- */
+  render();
+
+  async function boot() {
+    const db = window.claude?.use ? await window.claude.use("db").catch(() => null) : null;
+    if (db) {
+      const user = await window.claude.use("user").catch(() => null);
+      const can = user?.can ? await user.can("data.write").catch(() => null) : null;
+      state.canWrite = can !== false;
+      state.mode = "shared";
+      store = sharedStore(db);
+      setStatus(state.canWrite ? "Shared board · changes save for everyone" : "Shared board · view only");
+    } else {
+      state.mode = "local";
+      state.canWrite = true;
+      store = localStore();
+      setStatus("Saved in this browser only");
+    }
+    store.start();
+    render();
+  }
+  boot();
+})();
+</script>
+
+</body>
+</html>
