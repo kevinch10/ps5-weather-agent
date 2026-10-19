@@ -99,7 +99,7 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
 
   <section id="runs">
     <h2>Runs, checked against Zap history</h2>
-    <p>Published v1 at 23:20 SGT on Mon 19 Oct. The trigger, set up against the live BBC feed:</p>
+    <p>Published v1 at about 23:20 SGT on Mon 19 Oct. The trigger, set up against the live BBC feed:</p>
     <figure><img src="screens/01-v1-trigger.jpg" alt="RSS by Zapier trigger set to the BBC Singapore 3-day forecast feed" loading="lazy"><figcaption>Trigger: New Item in Feed, BBC location 1880252.</figcaption></figure>
     <div class="pending">In progress: screenshots of at least three runs, each checked against Zap history.</div>
   </section>
@@ -118,6 +118,7 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
       <li>The editor's Test tab <b>still showed the old cached Singapore records</b>, so the Zap looked fine until I pressed "Find new records". Then it showed: <i>Unable to pull feeds. The app returned "Not Found"</i>.</li>
       <li>Once published, the Zap polled the bad feed and Zapier <b>switched the Zap off</b> with the banner <i>Zap turned off due to a partner issue</i>.</li>
       <li><b>Zap history recorded no run at all</b> for this failure, and no forecast email was sent. My expectation was half right: no email, as I expected. But the failure did not show in Zap history either, so checking history alone would not catch it. A person has to check that the Zap is still on.</li>
+      <li>Zapier's default error alert (set to "Immediately") <b>did email me</b> that the Zap had been turned off. So the person in the loop gets a signal, but it comes from Zapier, not from the agent, and only if I read it.</li>
     </ul>
     <figure><img src="screens/02-tricky-error.jpg" alt="Zapier trigger test error: Unable to pull feeds, the app returned Not Found" loading="lazy"><figcaption>The trigger test against location 0000000.</figcaption></figure>
     <figure><img src="screens/04-tricky-turned-off.jpg" alt="Zapier banner: Zap turned off due to a partner issue" loading="lazy"><figcaption>Zapier turned the Zap off.</figcaption></figure>
