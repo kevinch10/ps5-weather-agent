@@ -214,7 +214,7 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
       el.classList.toggle("on", el.dataset.q === q);
       if (el.tagName === "BUTTON") el.setAttribute("aria-pressed", el.dataset.q === q ? "true" : "false");
     });
-    document.getElementById("mapstatus").textContent = "Marked: " + names[q] + (q === "bl" ? " (my answer to Q1)." : ". My answer is bottom left.");
+    document.getElementById("mapstatus").textContent = "Marked: " + names[q] + (q === "bl" ? ", my answer to Q1." : ". My answer is bottom left.");
   }
   document.querySelectorAll(".q").forEach(function (b) { b.addEventListener("click", function () { mark(b.dataset.q); }); });
   mark("bl");
