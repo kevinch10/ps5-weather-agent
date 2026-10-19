@@ -120,7 +120,7 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
     <h2>Runs, checked against Zap history</h2>
     <p>Published v1 at about 23:20 SGT on Mon 19 Oct. The trigger, set up against the live BBC feed:</p>
     <figure><img src="screens/01-v1-trigger.jpg" alt="RSS by Zapier trigger set to the BBC Singapore 3-day forecast feed" loading="lazy"><figcaption>Trigger: New Item in Feed, BBC location 1880252.</figcaption></figure>
-    <div class="pending">In progress: screenshots of at least three runs, each checked against Zap history.</div>
+    <div class="pending">Run log: as of Mon 19 Oct 23:38 SGT, Zap history shows no runs yet, because BBC had not posted a new Singapore forecast since 17:00 SGT. Screenshots of the runs, each checked against Zap history, will be added once the Zap has fired.</div>
   </section>
 
   <section id="tricky">
@@ -185,22 +185,30 @@ th { font-weight: 600; color: var(--ink-soft); font-size: 13px; text-transform: 
     <h3>(a) My quadrant</h3>
     <p><b>AI alone, with checks</b> (bottom left).</p>
     <h3>(b) The two questions</h3>
-    <p><b>Work with a right answer.</b> Every email can be checked against a source of truth: the forecast either matches BBC Weather's Singapore page at that time or it doesn't. The tricky case showed this too: with the wrong location ID there was a clear wrong answer (a 404), not a matter of taste. <span class="todo" data-todo="runs">[Run evidence to add: each email checked against Zap history and the BBC page.]</span></p>
+    <p><b>Work with a right answer.</b> Every email can be checked against a source of truth: the forecast either matches BBC Weather's Singapore page at that time or it doesn't. The tricky case showed this too: with the wrong location ID there was a clear wrong answer (a 404), not a matter of taste. The setup test email showed this. Its subject, "Tonight: Thundery Showers, Minimum Temperature: 28°C (82°F)", matched word for word the BBC feed I fetched separately at 23:00 SGT, so I could mark it right without any judgement call.</p>
     <p><b>Work that either of them can do alone.</b> I could look up the forecast myself in a minute, and the Zap does it with no human step at all: one trigger, one action, no approval in between. Nothing in the job needs a person and AI working on the same item at once.</p>
     <h3>(c) The person in the loop</h3>
     <p><b>Where I stay at the gate:</b> not before each email, but after. In my evening check I confirm the Zap is still on, compare each email with Zap history, and spot-check one forecast against bbc.co.uk/weather. <b>What the agent may do alone:</b> read one public feed and email one fixed address, mine. The Gmail "To" field is typed in, never mapped, so it cannot reach anyone else. <b>What would move it:</b> if it emailed classmates or clients, I would want to approve before sending, which moves it to <i>A person leads, AI inside</i>. If it advised on choices with no single right answer (for example "should we hold the outdoor event tomorrow?"), it moves to <i>A person decides, AI alongside</i>, with me making the call.</p>
     <h3>(d) My group's view</h3>
-    <p class="todo" data-todo="group">[To add: where our group placed its agents in class, and whether I agree.]</p>
+    <p>Our group's board (<a href="board.html">board.html</a>) puts the closest task to mine, <i>Stocks: pull daily closing prices</i>, in <b>AI alone, with checks</b>, because it is "a fixed, checkable fact" that a script fetches with a spot check. I agree, and my agent belongs beside it. The group put its agent-style tasks (screening stocks for a watchlist, gathering sources for a literature review, tailoring a CV per job) in <b>Agents run it, a person judges</b>, because there is no single right list. I agree for those too.</p>
+<p>Where I would answer differently is the <b>together or alone</b> question. The group answered it by asking whether a person must be inside each run. My tricky case shows that "alone" still needs a person outside the run: when the feed broke, the agent could not notice, Zap history logged nothing, and only Zapier's own alert email told me. So I keep my agent in "alone", but I'd add that "alone" agents need a named person who checks they are still running, not only that their output is right. I would also split the classmates' agents by the <b>right answer</b> question. A weather or "email matches a search" alert has a right answer. A "morning headlines" digest that chooses which stories matter does not, which would move it towards the right-hand column.</p>
   </section>
 
   <section id="log">
     <h2>Collaboration log</h2>
-    <p class="todo" data-todo="log">[Being completed after the runs.]</p>
+    <div class="scroll"><table>
+      <tbody>
+        <tr><th scope="row">What I delegated to AI</th><td>I used Claude (in the Claude desktop app, driving my Chrome) to compare Zapier's free options for a Singapore weather agent, find a free weather feed (BBC Weather RSS), click through the Zap set-up, draft this page and the card, create the GitHub repo and deploy it on Vercel. I did the Google sign-in and approved each step myself.</td></tr>
+        <tr><th scope="row">What I checked, and how</th><td>I checked that the Zap has one trigger and one action and uses only free apps (RSS by Zapier, Gmail), with no card added. I made sure the Gmail "To" field is my own personal address, typed in rather than mapped, with CC and BCC empty. I compared the test email against the raw BBC feed. I confirmed the broken-URL case in the editor, in Zap runs and in Zapier's alert email. I checked the page and repo load without signing in.</td></tr>
+        <tr><th scope="row">One AI error I caught</th><td>The AI stamped my tricky-case expectation "23:35 SGT", but it was written at 23:23, before the 23:25 run. I caught it by comparing with the git commit times and corrected it, because a wrong stamp would have made the expectation look as if it came <i>after</i> the run. A second near-miss: the editor kept showing old cached Singapore records after I broke the URL, so the AI's first read was that the trigger still worked. Pressing "Find new records" showed the real 404.</td></tr>
+        <tr><th scope="row">Time and cost</th><td>About 45 minutes on Mon 19 Oct (23:00–23:45 SGT) for the build, tricky case, fix and page. The cost is $0: Zapier free plan (a Pro trial switched on, but I used only free-plan features), Vercel Hobby and GitHub Free, with no card added anywhere.</td></tr>
+      </tbody>
+    </table></div>
   </section>
 
   <section id="reflection">
     <h2>Reflection</h2>
-    <p class="todo" data-todo="reflection">[Being completed after the runs.]</p>
+    <p>My agent fitted the job well: fetching a checkable forecast from one public feed and emailing it only to me is narrow, rule-bound work that a one-trigger, one-action Zap can do alone. It failed where a quiet agent is weakest: when the feed broke, it neither emailed nor logged a run, so silence looked the same as working, and only Zapier's own alert (and then the Zap turning off) gave it away. Next time I would add a regular "still alive" check, for example a weekly scheduled email that confirms the agent is on, and I would pick a feed that posts one item per update rather than three.</p>
   </section>
 
   <p class="meta">Our group's interactive map board from Week 7 is at <a href="board.html">board.html</a>. This page holds no client data or keys, email addresses are cropped from the screenshots, and the Zap-history JSON stays off GitHub.</p>
