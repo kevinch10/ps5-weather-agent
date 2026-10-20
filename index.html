@@ -85,9 +85,24 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 #maptable tr.on td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .status { font-size: 14px; }
 @media (max-width: 560px) { .map { grid-template-columns: 1fr 1fr; } .map > div:first-child, .rowh { display: none; } .colh { font-size: 12.5px; } .q { min-height: 130px; padding: 10px; } .q .qt { font-size: 14.5px; } }
+/* Edit mode (only with ?edit in the address) */
+body.editing [contenteditable="true"] { outline: 1.5px dashed color-mix(in srgb, var(--ai) 55%, transparent); outline-offset: 2px; border-radius: 3px; cursor: text; }
+body.editing [contenteditable="true"]:focus { outline: 2px solid var(--ai); background: color-mix(in srgb, var(--ai) 6%, transparent); }
+body.editing { padding-bottom: 150px; }
+#editbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--panel); border-top: 2px solid var(--ai);
+  box-shadow: 0 -4px 16px rgba(0,0,0,.12); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); font-size: 14px; }
+#editbar .row { max-width: 920px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+#editbar button { font: inherit; font-weight: 600; border-radius: 6px; padding: 7px 14px; border: 1px solid var(--rule); background: var(--note-bg); color: var(--ink); cursor: pointer; }
+#editbar button.primary { background: var(--ai); border-color: var(--ai); color: #fff; }
+#editbar button:disabled { opacity: .5; cursor: default; }
+#editbar input[type=password] { font: inherit; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--ink); min-width: 0; flex: 1 1 220px; }
+#editbar .msg { flex: 1 1 100%; color: var(--ink-soft); }
+#editbar .msg.err { color: var(--accent); }
+#editbar label { display: inline-flex; gap: 6px; align-items: center; color: var(--ink-soft); }
 </style>
 </head>
 <body>
+<!-- EDITABLE:START -->
 <div class="page">
   <header>
     <span class="badge">Problem Set 5 · My agent</span>
@@ -203,11 +218,11 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
       <div class="colh">Work with a right answer</div>
       <div class="colh">Work with no single right answer</div>
       <div class="rowh">Work that people and AI must do together</div>
-      <button class="q warm" data-q="tl" type="button"><span class="qt">A person leads, AI inside</span><span class="qs">The person leads and AI works inside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="40" cy="20" r="14" fill="var(--person)"/><circle cx="66" cy="20" r="8" fill="var(--ai)"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
-      <button class="q cool" data-q="tr" type="button"><span class="qt">Agents run it, a person judges</span><span class="qs">Agents run the process and a person judges inside it.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="30" cy="20" r="8" fill="var(--ai)"/><circle cx="52" cy="20" r="8" fill="var(--ai)"/><circle cx="80" cy="20" r="12" fill="var(--person)"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
+      <button class="q warm" data-q="tl" type="button"><span class="qt">A person leads, AI inside</span><span class="qs">The person leads and AI works inside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="40" cy="20" r="14" fill="var(--person)"></circle><circle cx="66" cy="20" r="8" fill="var(--ai)"></circle></svg><span class="pin">PSI &amp; Weather Update</span></button>
+      <button class="q cool" data-q="tr" type="button"><span class="qt">Agents run it, a person judges</span><span class="qs">Agents run the process and a person judges inside it.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="30" cy="20" r="8" fill="var(--ai)"></circle><circle cx="52" cy="20" r="8" fill="var(--ai)"></circle><circle cx="80" cy="20" r="12" fill="var(--person)"></circle></svg><span class="pin">PSI &amp; Weather Update</span></button>
       <div class="rowh">Work that either of them can do alone</div>
-      <button class="q cool" data-q="bl" type="button"><span class="qt">AI alone, with checks</span><span class="qs">AI does it, with spot checks.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--ai)"/><circle cx="84" cy="20" r="6" fill="none" stroke="var(--person)" stroke-width="3"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
-      <button class="q warm" data-q="br" type="button"><span class="qt">A person decides, AI alongside</span><span class="qs">A person decides with AI alongside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--person)"/><circle cx="80" cy="20" r="9" fill="var(--ai)"/></svg><span class="pin">PSI &amp; Weather Update</span></button>
+      <button class="q cool" data-q="bl" type="button"><span class="qt">AI alone, with checks</span><span class="qs">AI does it, with spot checks.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--ai)"></circle><circle cx="84" cy="20" r="6" fill="none" stroke="var(--person)" stroke-width="3"></circle></svg><span class="pin">PSI &amp; Weather Update</span></button>
+      <button class="q warm" data-q="br" type="button"><span class="qt">A person decides, AI alongside</span><span class="qs">A person decides with AI alongside.</span><svg viewBox="0 0 120 40" aria-hidden="true"><circle cx="46" cy="20" r="14" fill="var(--person)"></circle><circle cx="80" cy="20" r="9" fill="var(--ai)"></circle></svg><span class="pin">PSI &amp; Weather Update</span></button>
     </div>
     <p class="status" id="mapstatus" aria-live="polite"></p>
     <div class="scroll">
@@ -258,6 +273,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
   <p class="meta">Our group's map board is at <a href="https://ai-work-quadrants.vercel.app/">ai-work-quadrants.vercel.app</a> (a copy is kept at <a href="board.html">board.html</a>). My earlier one-trigger, one-action attempt is archived at <a href="sg-weather-watch.html">sg-weather-watch.html</a>. This page holds no client data or keys, email addresses are covered in the screenshots, and the Zap-history JSON stays off GitHub.</p>
 </div>
+<!-- EDITABLE:END -->
 <script>
 (function () {
   var names = { tl: "A person leads, AI inside (top left)", tr: "Agents run it, a person judges (top right)",
@@ -271,6 +287,120 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
   }
   document.querySelectorAll(".q").forEach(function (b) { b.addEventListener("click", function () { mark(b.dataset.q); }); });
   mark("bl");
+})();
+</script>
+<script>
+/* Edit mode: open the page with ?edit, click any write-up text, then Save to GitHub (needs your own token). */
+(function () {
+  var REPO = "kevinch10/ps5-weather-agent", PATH = "index.html", BRANCH = "main";
+  var START = "<" + "!-- EDITABLE:START -->", END = "<" + "!-- EDITABLE:END -->", TOKEN_KEY = "ps5-gh-token";
+  var q = new URLSearchParams(location.search);
+  if (!q.has("edit") && location.hash !== "#edit") return;
+
+  var SEL = "header .lede, section p, section li, section td, section pre.card, figcaption, section h3";
+  var dirty = false, token = null;
+  try { token = localStorage.getItem(TOKEN_KEY); } catch (e) {}
+
+  document.body.classList.add("editing");
+  document.querySelectorAll(SEL).forEach(function (el) {
+    if (el.closest("#maptable") || el.id === "mapstatus") return;
+    el.setAttribute("contenteditable", "true");
+    el.setAttribute("spellcheck", "true");
+  });
+  document.addEventListener("input", function (e) { if (e.target.closest && e.target.closest("[contenteditable]")) setDirty(true); });
+  document.addEventListener("paste", function (e) {
+    if (!e.target.closest || !e.target.closest("[contenteditable]")) return;
+    e.preventDefault();
+    document.execCommand("insertText", false, (e.clipboardData || window.clipboardData).getData("text/plain"));
+  });
+  window.addEventListener("beforeunload", function (e) { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+  var bar = document.createElement("div");
+  bar.id = "editbar";
+  bar.innerHTML =
+    '<div class="row">' +
+      '<b>Edit mode</b>' +
+      '<span id="tokrow" style="display:contents">' +
+        '<input type="password" id="tok" placeholder="GitHub token (only needed to save)" autocomplete="off">' +
+        '<label><input type="checkbox" id="remember" checked> Remember on this device</label>' +
+      '</span>' +
+      '<button type="button" class="primary" id="save" disabled>Save to GitHub</button>' +
+      '<button type="button" id="dl">Download page</button>' +
+      '<button type="button" id="discard">Discard changes</button>' +
+      '<button type="button" id="forget">Forget token</button>' +
+      '<span class="msg" id="msg">Click any outlined text to edit it. Nothing is saved until you press Save.</span>' +
+    '</div>';
+  document.body.appendChild(bar);
+  var $ = function (id) { return document.getElementById(id); };
+  function showTokenRow() { $("tokrow").style.display = token ? "none" : "contents"; $("forget").style.display = token ? "" : "none"; }
+  showTokenRow();
+  function msg(t, err) { var m = $("msg"); m.textContent = t; m.className = "msg" + (err ? " err" : ""); }
+  function setDirty(v) { dirty = v; $("save").disabled = !v; if (v) msg("Unsaved changes."); }
+
+  function cleanPage() {
+    var page = document.querySelector(".page").cloneNode(true);
+    page.querySelectorAll("[contenteditable]").forEach(function (el) { el.removeAttribute("contenteditable"); el.removeAttribute("spellcheck"); });
+    page.querySelectorAll(".q, #maptable tr").forEach(function (el) {
+      el.classList.remove("on"); el.removeAttribute("aria-pressed");
+      if (!el.getAttribute("class")) el.removeAttribute("class");
+    });
+    var st = page.querySelector("#mapstatus"); if (st) st.textContent = "";
+    return page.outerHTML;
+  }
+  function splice(file) {
+    var a = file.indexOf(START), b = file.indexOf(END);
+    if (a < 0 || b < a) throw new Error("Markers not found in index.html");
+    return file.slice(0, a + START.length) + "\n" + cleanPage() + "\n" + file.slice(b);
+  }
+  function b64decode(b64) { return new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, "")), function (c) { return c.charCodeAt(0); })); }
+  function b64encode(str) {
+    var bytes = new TextEncoder().encode(str), bin = "";
+    for (var i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  window.__ps5Splice = splice;
+
+  $("save").addEventListener("click", function () {
+    if (!token) {
+      var t = $("tok").value.trim();
+      if (!t) { msg("Paste your GitHub token first (see the README for how to make one).", true); $("tok").focus(); return; }
+      token = t;
+      if ($("remember").checked) { try { localStorage.setItem(TOKEN_KEY, token); } catch (e) {} }
+    }
+    var api = "https://api.github.com/repos/" + REPO + "/contents/" + PATH;
+    var headers = { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json" };
+    $("save").disabled = true; msg("Saving…");
+    fetch(api + "?ref=" + BRANCH, { headers: headers, cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("GitHub said " + r.status + " when reading the page. Check the token."); return r.json(); })
+      .then(function (f) {
+        var next = splice(b64decode(f.content));
+        return fetch(api, { method: "PUT", headers: headers, body: JSON.stringify({
+          message: "Edit write-ups on the page", content: b64encode(next), sha: f.sha, branch: BRANCH }) });
+      })
+      .then(function (r) {
+        if (!r.ok) return r.json().then(function (j) { throw new Error("GitHub said " + r.status + ": " + (j.message || "save failed")); });
+        dirty = false; showTokenRow();
+        msg("Saved to GitHub. Vercel will show the change in about 30 seconds.");
+      })
+      .catch(function (e) {
+        if (/401|403/.test(e.message)) { token = null; try { localStorage.removeItem(TOKEN_KEY); } catch (x) {} showTokenRow(); }
+        msg(e.message, true); $("save").disabled = !dirty;
+      });
+  });
+  $("dl").addEventListener("click", function () {
+    fetch(location.pathname.replace(/[^/]*$/, "") + "index.html", { cache: "no-store" }).then(function (r) { return r.text(); }).then(function (file) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([splice(file)], { type: "text/html" }));
+      a.download = "index.html"; document.body.appendChild(a); a.click(); a.remove();
+      msg("Downloaded index.html with your edits. You can upload it to GitHub yourself.");
+    }).catch(function (e) { msg("Download failed: " + e.message, true); });
+  });
+  $("discard").addEventListener("click", function () {
+    if (!dirty || confirm("Discard your unsaved changes?")) { dirty = false; location.reload(); }
+  });
+  $("forget").addEventListener("click", function () {
+    token = null; try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} showTokenRow(); msg("Token removed from this device.");
+  });
 })();
 </script>
 </body>
