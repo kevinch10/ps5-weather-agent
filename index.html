@@ -122,7 +122,7 @@ body.editing { padding-bottom: 150px; }
 <b>3. The tools:</b> Schedule by Zapier (trigger). Filter by Zapier. Code by Zapier (JavaScript that only reads three public NEA endpoints on data.gov.sg: psi, twenty-four-hr-forecast, air-temperature). Email by Zapier: Send Outbound Email (to me only).
 <b>4. It must never:</b> email anyone but me. The "To" field is typed in as my own address, never mapped from data, and CC and BCC are left empty.
 <b>5. Where a person checks:</b> I (the student) read each email when it arrives. Once a day I confirm the Zap is still on, scan Zap history for anything Errored, and compare one email with NEA's figure for the same hour, until I turn the Zap off after class on Wed 21 Oct.</pre>
-    <p class="note"><br></p>
+    <p class="note"><b>Two things I should be upfront about.</b> First, I only wrote this agent card on 20 Oct, after I had built the Zap, so it was not written before the first run as the brief asks. Second, the brief asks for one trigger and one action on the free plan, but my Zap has four steps: Zapier's schedule cannot do "every 6 hours", so I needed a filter, and an email step cannot fetch data on its own, so I needed a code step. These extra steps only work on Zapier's free trial (the editor warns that the Zap "uses paid features"). My earlier attempt that did follow the rules, <a href="sg-weather-watch.html">SG Weather Watch</a> (RSS → Gmail), never ran once, so I am handing in this agent instead.</p>
   </section>
 
   <section id="zap">
@@ -183,7 +183,7 @@ body.editing { padding-bottom: 150px; }
     <h2>Tricky case &amp; fix</h2>
     <h3>The case: NEA has no PSI reading</h3>
     <p>When data.gov.sg has no PSI data for the time asked, it does not send an empty list. It answers <code>{"code":17, "name":"REAL_TIME_API_DATA_NOT_FOUND", "data":null}</code>. I simulated this by asking for a date with no data (<code>psi?date=2030-01-01</code>) in a draft of the Zap, so the live Zap was never touched.</p>
-    <h3>What I expected</h3>
+    <h3>What I expected, written before the run (Tue 20 Oct 2026, 01:16 SGT)</h3>
     <ul>
       <li>The code step reads <code>psiRes.data.items[0]</code> with no guard, so it should throw a TypeError ("Cannot read properties of null").</li>
       <li>The run should show as <b>Errored</b> at step 3, step 4 should never run, and <b>no email</b> should be sent.</li>
@@ -260,8 +260,8 @@ body.editing { padding-bottom: 150px; }
       <tbody>
         <tr><th scope="row">What I delegated to AI</th><td>I used Claude and Zapier to build the Zap, Claude helped me write and test the JavaScript code step, add the weather, run the Step 2 checks, run the tricky case and the fix. I logged in to Zapier, chose the PSI idea, the 6-hour intervals and adding the weather feature.</td></tr>
         <tr><th scope="row">What I checked, and how</th><td>Each version of the code was run against live NEA data before it went into Zapier, and the code in Zapier was compared character by character with the tested file. The filter was tested with real trigger records. The three emails were checked against NEA's historical API, and Zap history was scanned for errors. After the tricky case, the published code was checked to confirm it uses the live PSI request, not the test date. Email addresses are covered in every screenshot.</td></tr>
-        <tr><th scope="row">One AI error I caught</th><td>The filter test showed the 2 pm record would <b>pass</b>, because "Is in" matches text inside text, and "2" is inside "12". Published like that, the Zap would have emailed at 1, 2, 6 and 12 o'clock, am and pm, about eight emails a day, over Zapier's limit of 5. It was replaced with three "Exactly matches" rules joined by OR and tested again (2 pm blocked). A smaller one: the AI assumed midnight would show as hour "0", but a real record showed "12". That was harmless, because 12 was already allowed.</td></tr>
-        <tr><th scope="row">Time and cost</th><td>About 2 hours in total: build on Tuesday 20 Oct and the Step 2 checks, tricky case, fix and this page. Cash cost $0: Zapier's 14-day Professional trial, Vercel Hobby, GitHub Free and free NEA data, plus my existing Claude plan. Each emailed run uses 2 Zapier tasks.</td></tr>
+        <tr><th scope="row">One AI error I caught</th><td>Claude's first filter used Zapier's "(Text) Is in" rule with "0,6,12". The filter test showed the 2 pm record would <b>pass</b>, because "Is in" matches text inside text, and "2" is inside "12". Published like that, the Zap would have emailed at 1, 2, 6 and 12 o'clock, am and pm, about eight emails a day, over Zapier's limit of 5. It was replaced with three "Exactly matches" rules joined by OR and tested again (2 pm blocked). A smaller one: the AI assumed midnight would show as hour "0", but a real record showed "12". That was harmless, because 12 was already allowed.</td></tr>
+        <tr><th scope="row">Time and cost</th><td>About 2 hours in total: I built the Zap on Wed 14 Oct, then added the weather and did the Step 2 checks, tricky case, fix and this page on Tue 20 Oct. Cash cost $0: Zapier's 14-day Professional trial, Vercel Hobby, GitHub Free and free NEA data, plus my existing Claude plan. Each emailed run uses 2 Zapier tasks.</td></tr>
       </tbody>
     </table></div>
   </section>
