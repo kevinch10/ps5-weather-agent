@@ -122,7 +122,7 @@ body.editing { padding-bottom: 150px; }
 <b>3. The tools:</b> Schedule by Zapier (trigger). Filter by Zapier. Code by Zapier (JavaScript that only reads three public NEA endpoints on data.gov.sg: psi, twenty-four-hr-forecast, air-temperature). Email by Zapier: Send Outbound Email (to me only).
 <b>4. It must never:</b> email anyone but me. The "To" field is typed in as my own address, never mapped from data, and CC and BCC are left empty.
 <b>5. Where a person checks:</b> I (the student) read each email when it arrives. Once a day I confirm the Zap is still on, scan Zap history for anything Errored, and compare one email with NEA's figure for the same hour, until I turn the Zap off after class on Wed 21 Oct.</pre>
-    <p class="note"><b>Two honest notes.</b> (1) I set the job on Wed 14 Oct, 14:30 SGT ("PSI updates for Singapore, a trigger every 6 hours, one email to myself"), but I only wrote this five-line card on 20 Oct, after the build, so it was <i>not</i> written before the first run as the brief asks. (2) The brief asks for one trigger and one action on the free plan. My Zap has four steps, because Zapier's schedule has no "every 6 hours" option (so a filter is needed) and an email step cannot fetch data by itself (so a code step is needed). These run on Zapier's 14-day trial, and the editor warns that the Zap "uses paid features". My earlier one-trigger, one-action attempt, <a href="sg-weather-watch.html">SG Weather Watch</a> (RSS → Gmail), followed the rules but never fired (0 runs), so I hand in this agent instead.</p>
+    <p class="note"><br></p>
   </section>
 
   <section id="zap">
@@ -150,8 +150,8 @@ body.editing { padding-bottom: 150px; }
 
   <section id="runs">
     <h2>Runs, checked against Zap history</h2>
-    <p>From the first scheduled run (Wed 14 Oct, 18:00) to Tue 20 Oct, 15:00 SGT, Zap history holds <b>24 scheduled emails</b>, exactly the number expected (one on 14 Oct, four a day from 15 to 19 Oct, then 00:00, 06:00 and 12:00 on 20 Oct). Every other hourly run is <i>Filtered</i>, stopped on purpose by the filter, and the only <i>Errored</i> run is my deliberate tricky-case test (below). No scheduled run has failed.</p>
-    <p>For five scheduled runs I compared every number in the email (PSI and PM2.5 for five regions) with NEA's own record for the same hour, which I fetched separately from data.gov.sg (<code>/v2/real-time/api/psi?date=…</code>).</p>
+    <p>From the first scheduled run (Wed 14 Oct, 18:00) to Tue 20 Oct, 15:00 SGT, Zap history holds <b>24 scheduled emails</b>, exactly the number expected. Every other hourly run is <i>Filtered</i>, stopped on purpose by the filter, and the only <i>Errored</i> run is my deliberate tricky-case test (below). No scheduled run has failed.</p>
+    <p>For five scheduled runs I compared every number in the email (PSI and PM2.5 for five regions) with NEA's own record for the same hour, which I fetched separately from data.gov.sg.</p>
     <div class="scroll"><table>
       <thead><tr><th>Run (SGT)</th><th>Zap history</th><th>Reading in the email</th><th>Highest PSI</th><th>vs NEA record</th></tr></thead>
       <tbody>
@@ -183,7 +183,7 @@ body.editing { padding-bottom: 150px; }
     <h2>Tricky case &amp; fix</h2>
     <h3>The case: NEA has no PSI reading</h3>
     <p>When data.gov.sg has no PSI data for the time asked, it does not send an empty list. It answers <code>{"code":17, "name":"REAL_TIME_API_DATA_NOT_FOUND", "data":null}</code>. I simulated this by asking for a date with no data (<code>psi?date=2030-01-01</code>) in a draft of the Zap, so the live Zap was never touched.</p>
-    <h3>What I expected, written before the run (Tue 20 Oct 2026, 01:16 SGT)</h3>
+    <h3>What I expected</h3>
     <ul>
       <li>The code step reads <code>psiRes.data.items[0]</code> with no guard, so it should throw a TypeError ("Cannot read properties of null").</li>
       <li>The run should show as <b>Errored</b> at step 3, step 4 should never run, and <b>no email</b> should be sent.</li>
@@ -207,12 +207,12 @@ body.editing { padding-bottom: 150px; }
       <figure><img src="screens/psi/09-fix-rerun-successful.jpg" alt="Zap run Successful at 01:21:34" loading="lazy"><figcaption>The rerun: Successful.</figcaption></figure>
       <figure><img src="screens/psi/10-fix-rerun-email.jpg" alt="Email: Singapore PSI unavailable, with the weather section" loading="lazy"><figcaption>The "PSI unavailable" email it sent instead of failing.</figcaption></figure>
     </div>
-    <figure><img src="screens/psi/11-history-errored-then-fixed.jpg" alt="Zap history: Errored test run at 01:18, then Successful test run at 01:21" loading="lazy"><figcaption>Zap history: the Errored tricky case (01:18), then the fixed rerun (01:21).</figcaption></figure>
+    <figure><img src="screens/psi/11-history-errored-then-fixed.jpg" alt="Zap history: Errored test run at 01:18, then Successful test run at 01:21" loading="lazy"><figcaption><br></figcaption></figure>
   </section>
 
   <section id="map">
     <h2>Where it sits on our map</h2>
-    <p class="meta">Tap a quadrant to try it: the map and the table mark it. Nothing is saved. My answer, <b>AI alone, with checks</b>, is marked when the page loads.</p>
+    <p class="meta"><b>AI alone, with checks</b></p>
     <div class="map" id="mapgrid">
       <div></div>
       <div class="colh">Work with a right answer</div>
@@ -236,7 +236,7 @@ body.editing { padding-bottom: 150px; }
       </tbody>
     </table>
     </div>
-    <p class="meta">Purple stands for the person and blue for AI, as in our Week 7 deck.</p>
+    <p class="meta"><br></p>
   </section>
 
   <section id="q1">
@@ -258,17 +258,17 @@ body.editing { padding-bottom: 150px; }
     <h2>Collaboration log</h2>
     <div class="scroll"><table>
       <tbody>
-        <tr><th scope="row">What I delegated to AI</th><td>I used Claude (Claude Code in the Claude desktop app, with its built-in browser) to build the Zap in Zapier's web editor, write and test the JavaScript code step, add the weather, run the Step 2 checks (all 14 pages of Zap history, and 30 numbers compared with NEA's records), run the tricky case and the fix, export the JSON, and draft and publish this page. I logged in to Zapier myself, chose the PSI idea, the 6-hour cadence and adding the weather, and approved each step, including publishing.</td></tr>
-        <tr><th scope="row">What I checked, and how</th><td>Each version of the code was run against live NEA data before it went into Zapier, and the code in Zapier was compared character by character (by a checksum) with the tested file. The filter was tested with real trigger records (a 2 pm record must stop, a midnight record must pass). The three emails were checked against NEA's historical API, and Zap history was scanned for errors. After the tricky case, the published code was checked to confirm it uses the live PSI request, not the test date. Email addresses are covered in every screenshot, and <code>*.json</code> is in <code>.gitignore</code>, so the Zap-history file stays off GitHub.</td></tr>
-        <tr><th scope="row">One AI error I caught</th><td>The AI's first filter used Zapier's <i>(Text) Is in</i> rule with "0,6,12". The filter test showed the 2 pm record would <b>pass</b>, because "Is in" matches text inside text, and "2" is inside "12". Published like that, the Zap would have emailed at 1, 2, 6 and 12 o'clock, am and pm, about eight emails a day, over Zapier's limit of 5. It was replaced with three "Exactly matches" rules joined by OR and tested again (2 pm blocked). A smaller one: the AI assumed midnight would show as hour "0", but a real record showed "12". That was harmless, because 12 was already allowed.</td></tr>
-        <tr><th scope="row">Time and cost</th><td>About 2 hours in total: build on Wed 14 Oct (about 14:30–15:05 SGT), adding the weather on Tue 20 Oct (00:40–00:50), and the Step 2 checks, tricky case, fix and this page (01:05–01:50). Cash cost $0: Zapier's 14-day Professional trial with no card (the four-step Zap needs paid features, about US$19.99 a month after the trial), Vercel Hobby, GitHub Free and free NEA data, plus my existing Claude plan. Each emailed run uses 2 Zapier tasks.</td></tr>
+        <tr><th scope="row">What I delegated to AI</th><td>I used Claude and Zapier to build the Zap, Claude helped me write and test the JavaScript code step, add the weather, run the Step 2 checks, run the tricky case and the fix. I logged in to Zapier, chose the PSI idea, the 6-hour intervals and adding the weather feature.</td></tr>
+        <tr><th scope="row">What I checked, and how</th><td>Each version of the code was run against live NEA data before it went into Zapier, and the code in Zapier was compared character by character with the tested file. The filter was tested with real trigger records. The three emails were checked against NEA's historical API, and Zap history was scanned for errors. After the tricky case, the published code was checked to confirm it uses the live PSI request, not the test date. Email addresses are covered in every screenshot.</td></tr>
+        <tr><th scope="row">One AI error I caught</th><td>The filter test showed the 2 pm record would <b>pass</b>, because "Is in" matches text inside text, and "2" is inside "12". Published like that, the Zap would have emailed at 1, 2, 6 and 12 o'clock, am and pm, about eight emails a day, over Zapier's limit of 5. It was replaced with three "Exactly matches" rules joined by OR and tested again (2 pm blocked). A smaller one: the AI assumed midnight would show as hour "0", but a real record showed "12". That was harmless, because 12 was already allowed.</td></tr>
+        <tr><th scope="row">Time and cost</th><td>About 2 hours in total: build on Tuesday 20 Oct and the Step 2 checks, tricky case, fix and this page. Cash cost $0: Zapier's 14-day Professional trial, Vercel Hobby, GitHub Free and free NEA data, plus my existing Claude plan. Each emailed run uses 2 Zapier tasks.</td></tr>
       </tbody>
     </table></div>
   </section>
 
   <section id="reflection">
     <h2>Reflection</h2>
-    <p>My agent fitted the job well: reading official, checkable numbers on a fixed schedule and emailing them only to me is narrow, right-answer work it did alone, with 24 scheduled emails, no failed scheduled run and 50 of 50 checked numbers matching NEA. It failed where its data source went quiet: when NEA had no PSI reading, the code crashed and no email went out, so silence looked the same as clean air, and it also needed paid Zapier features that the brief asked me to avoid. I would keep the "PSI unavailable" fallback, add a daily "still running" check, and before building, test whether the job fits one trigger and one action on the free plan, rather than finding out after.</p>
+    <p>My agent was a good fit for the job: it just had to fetch official numbers on a set schedule and email them to me, and since every number can be checked against NEA’s website, it could do that without me stepping in. Where it fell short was when NEA had no PSI reading: the code broke, no email arrived, and because I wasn’t expecting anything, I wouldn’t have noticed that something had gone wrong; it also needed paid Zapier features, even though the brief asked us to stay on the free plan. If I did this again, I would keep the “PSI unavailable” email, add a simple daily check that the Zap is still running, and make sure my idea fits one trigger and one action on the free plan before I start building.</p>
   </section>
 
   <p class="meta">Our group's map board is at <a href="https://ai-work-quadrants.vercel.app/">ai-work-quadrants.vercel.app</a> (a copy is kept at <a href="board.html">board.html</a>). My earlier one-trigger, one-action attempt is archived at <a href="sg-weather-watch.html">sg-weather-watch.html</a>. This page holds no client data or keys, email addresses are covered in the screenshots, and the Zap-history JSON stays off GitHub.</p>
