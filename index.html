@@ -85,6 +85,22 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 #maptable tr.on td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .status { font-size: 14px; }
 @media (max-width: 560px) { .map { grid-template-columns: 1fr 1fr; } .map > div:first-child, .rowh { display: none; } .colh { font-size: 12.5px; } .q { min-height: 130px; padding: 10px; } .q .qt { font-size: 14.5px; } }
+/* Our group's board (copy of ai-work-quadrants.vercel.app) */
+:root { --c-navy:#1e2f55; --c-blue:#1f6d94; --c-sky:#4a8db8; --c-gold:#a17b1d; --c-red:#c4434f; --c-green:#258a59; --c-purple:#7a55b5; --c-teal:#13777a; --c-orange:#bd5f1a; --c-pink:#b2427c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --c-navy:#3a5a88; --c-blue:#2a7fb0; --c-sky:#3f93c4; --c-gold:#a8801c; --c-red:#c84455; --c-green:#23885b; --c-purple:#8160bd; --c-teal:#1b8a8d; --c-orange:#c56a24; --c-pink:#bd4f88; } }
+.gboard { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0 6px; }
+.gq { border: 1.5px solid var(--q-cool-line); background: var(--q-cool); border-radius: 10px; padding: 12px 14px; }
+.gq.warm { border-color: var(--q-warm-line); background: var(--q-warm); }
+.gq.mineq { border: 3px solid var(--accent); }
+.gqt { font-weight: 600; color: var(--q-ink); font-size: 16px; }
+.gtags { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 8px; }
+.gtags span { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 6px; background: var(--panel); }
+.gtask { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; padding: 3px 0; line-height: 1.35; }
+.gtask[title] { cursor: help; }
+.gdot { flex: 0 0 auto; width: 12px; height: 12px; border-radius: 50%; margin-top: 3px; }
+.gtask.mine { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); border: 1.5px solid var(--accent); border-radius: 6px; padding: 5px 8px; margin: 3px -4px; }
+.gpin { display: inline-block; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; padding: 0 8px; border-radius: 999px; margin-left: 2px; }
+@media (max-width: 560px) { .gboard { grid-template-columns: 1fr; } }
 /* Edit mode (only with ?edit in the address) */
 body.editing [contenteditable="true"] { outline: 1.5px dashed color-mix(in srgb, var(--ai) 55%, transparent); outline-offset: 2px; border-radius: 3px; cursor: text; }
 body.editing [contenteditable="true"]:focus { outline: 2px solid var(--ai); background: color-mix(in srgb, var(--ai) 6%, transparent); }
@@ -235,6 +251,47 @@ body.editing { padding-bottom: 150px; }
         <tr data-q="br"><td><b>A person decides, AI alongside</b><br><span class="meta">bottom right</span></td><td>No single right answer</td><td>Either can do it alone</td><td>A person decides with AI alongside, which drafts the options and checks the facts.</td></tr>
       </tbody>
     </table>
+    </div>
+    <h3 id="groupboard">On our group's board</h3>
+    <p class="meta">Our group's board, <a href="https://ai-work-quadrants.vercel.app/">AI Work Quadrants</a>, with its 28 tasks in the places the group gave them. I added my agent, <b>PSI &amp; weather updates</b>, to <b>AI alone, with checks</b>, next to <i>Stocks · Pull daily closing prices</i>, the group's closest task: both fetch a published, checkable fact on a schedule. Hover over a task to read the group's reason for its place.</p>
+    <div class="gboard">
+      <div class="gq warm" data-gq="tl"><div class="gqt">A person leads, AI inside</div><div class="gtags"><span>Work with a right answer</span><span>Work that people and AI must do together</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-navy)"></span><span>Bank · Check a loan file</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-blue)"></span><span>Government · Approve a benefit claim</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-gold)"></span><span>Product · Write release notes</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-red)"></span><span>Marketing · Translate a product page</span></div>
+        <div class="gtask" title="There is one correct figure, but it rests on your own trade records and tax situation. You lead, and AI does the arithmetic and flags missing lots."><span class="gdot" style="background:var(--c-teal)"></span><span>Stocks · Work out capital gains tax</span></div>
+        <div class="gtask" title="The answers are right or wrong, and the point is that you learn the method. You work the problem and use AI to check steps, not to hand in its answers."><span class="gdot" style="background:var(--c-orange)"></span><span>Student · Solve a finance problem set</span></div>
+        <div class="gtask" title="Only you know the true facts. AI can spot gaps, overlaps and inconsistent formatting, but you confirm every line."><span class="gdot" style="background:var(--c-pink)"></span><span>CV · Check dates and job titles</span></div>
+      </div>
+      <div class="gq cool" data-gq="tr"><div class="gqt">Agents run it, a person judges</div><div class="gtags"><span>Work with no single right answer</span><span>Work that people and AI must do together</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-red)"></span><span>Marketing · Test ad versions</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-purple)"></span><span>Consulting · Size a market</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-gold)"></span><span>Product · Sort user comments</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-green)"></span><span>Insurer · Settle a disputed claim</span></div>
+        <div class="gtask" title="There is no single right list. An agent can run many screens across thousands of tickers, and you judge which names deserve a closer look."><span class="gdot" style="background:var(--c-teal)"></span><span>Stocks · Screen stocks for a watchlist</span></div>
+        <div class="gtask" title="Many reading lists could work. Agents can search and summarise widely, and you judge which sources are credible and relevant."><span class="gdot" style="background:var(--c-orange)"></span><span>Student · Gather sources for a literature review</span></div>
+        <div class="gtask" title="Each posting wants a different emphasis. An agent drafts a version per job, and you judge whether each one still sounds like you and stays true."><span class="gdot" style="background:var(--c-pink)"></span><span>CV · Tailor a CV to each job posting</span></div>
+      </div>
+      <div class="gq cool mineq" data-gq="bl"><div class="gqt">AI alone, with checks</div><div class="gtags"><span>Work with a right answer</span><span>Work that either of them can do alone</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-green)"></span><span>Payments · Match payments to invoices</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-green)"></span><span>Insurer · Check a claim form</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-sky)"></span><span>Tech · Reset a password by policy</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-blue)"></span><span>Government · Check a permit form</span></div>
+        <div class="gtask" title="A fixed, checkable fact. AI or a script can fetch it alone, with a spot check against the exchange or a second data source."><span class="gdot" style="background:var(--c-teal)"></span><span>Stocks · Pull daily closing prices</span></div>
+        <div class="gtask mine" title="My agent: NEA publishes the PSI and the weather, so every number in the email can be checked against NEA after it is sent. The Zap fetches and emails it alone, and I spot-check one email a day."><span class="gdot" style="background:var(--accent)"></span><span><b>Singapore · PSI &amp; weather updates</b> <span class="gpin">My agent</span></span></div>
+        <div class="gtask" title="The style guide has right answers. AI can format the whole list, and a quick check catches any wrong author or year."><span class="gdot" style="background:var(--c-orange)"></span><span>Student · Format citations in APA</span></div>
+        <div class="gtask" title="Errors are clear-cut. AI can correct them alone, and you skim the result before sending."><span class="gdot" style="background:var(--c-pink)"></span><span>CV · Fix spelling and grammar</span></div>
+      </div>
+      <div class="gq warm" data-gq="br"><div class="gqt">A person decides, AI alongside</div><div class="gtags"><span>Work with no single right answer</span><span>Work that either of them can do alone</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-purple)"></span><span>Consulting · Advise on a merger</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-navy)"></span><span>Bank · Plan a negotiation</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-green)"></span><span>Asset manager · Write investor letter</span></div>
+        <div class="gtask"><span class="gdot" style="background:var(--c-blue)"></span><span>Government · Draft a policy</span></div>
+        <div class="gtask" title="It depends on your goals, risk and timing, and you carry the outcome. AI can lay out scenarios and counterarguments, but the call is yours."><span class="gdot" style="background:var(--c-teal)"></span><span>Stocks · Decide whether to sell a holding</span></div>
+        <div class="gtask" title="It depends on your interests and career plans. AI can compare workloads and prerequisites, and you make the choice."><span class="gdot" style="background:var(--c-orange)"></span><span>Student · Choose electives for next term</span></div>
+        <div class="gtask" title="This is your story to tell. AI can suggest angles for a role, and you decide what represents you best."><span class="gdot" style="background:var(--c-pink)"></span><span>CV · Choose which experience to highlight</span></div>
+      </div>
     </div>
     <p class="meta"><br></p>
   </section>
